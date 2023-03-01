@@ -10,6 +10,8 @@ const cors = require("cors")
 app.use(cors())
 app.use(express.json())
 
+app.use('/event', require('./Routes/event.route'))
+
 app.listen(PORT, () => {
     console.log('Server is running : listening to port ' + PORT);
 })
