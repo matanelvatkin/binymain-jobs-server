@@ -31,11 +31,9 @@ const eventSchema = new mongoose.Schema ({
     },
    beginningTime : {
     type : String,
-    require: true
    },
    finishTime : {
     type : String,
-   require : true
    },
    place : {
     type : String,
