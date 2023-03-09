@@ -84,7 +84,7 @@ const eventSchema = new mongoose.Schema ({
    },
    status : {
     type: String,
-    enum:["published","waiting-for-approval", "invalid"],
+    enum:["published","waiting-for-approval", "invalid", "deleted"],
     default: "waiting-for-approval"
    }
 });
