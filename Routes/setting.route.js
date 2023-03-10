@@ -1,7 +1,12 @@
 const express = require('express'),
 router = express.Router()
 
-router.post('/setting',async (req,res)=>{
+router.get('/setting', async (req,res)=>{
+    try {
+
+    } catch(err) {
+
+    }
 })
 
 module.exports = router
