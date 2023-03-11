@@ -1,5 +1,5 @@
 const { trusted } = require("mongoose");
-const mongoose = require("mongose");
+const mongoose = require("mongoose");
 require("./setting.model");
 
 const eventSchema = new mongoose.Schema({
