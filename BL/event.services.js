@@ -3,8 +3,8 @@ require("../Dl/db").connect();
 
 async function createNewEvent(eventData) {
   //   productValidation(eventData);
-  const exists = await eventIsExists(eventData.name);
-  if (exists.length > 0) throw new Error("event id already exists");
+  //   const exists = await eventIsExists(eventData.name);
+  //   if (exists.length > 0) throw new Error("event id already exists");
 
   const newEvent = await eventController.create(eventData);
   return {
