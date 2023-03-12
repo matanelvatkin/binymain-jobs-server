@@ -1,13 +1,31 @@
 const {errMessage} = require("../errController");
 const eventsData = require("./event.model");
 
-async function create (data) {
-    return await eventsData.create(data);
-}
 
-async function read (filter) {
-    return await eventsData.find(filter);
-}
+
+const create = async (req,res)=>{
+        const Event = req.body;
+    
+        const newEvent = new eventsData(Event);
+    
+        try {
+            await newEvent.save();
+            res.status(201).json(newEvent);
+        } catch (error) {
+            res.status(409).json({ message: error.message})
+            console.log(error);
+        }
+    }
+
+    const read = async(req, res)=>{
+        try {
+            const allEvents = await eventsData.find();
+    
+            res.status(200).json(allEvents);
+        } catch (error) {
+            res.status(404).json({message: error.message})
+        }
+    } 
 
 async function readOne (filter) {
     const res = await eventsData.findOne(filter);
