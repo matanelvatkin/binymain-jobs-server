@@ -8,7 +8,7 @@ const mongoose = require ("mongoose");
 
 const settingSchema = new mongoose.Schema ({
     name : {
-        type: string,
+        type: String,
         require: true
     },
     settingData : [
