@@ -14,6 +14,7 @@ const err = (c, m) => {
     PASSWORDS_ARE_NOT_EQUAL: err(400, "passwords are not equal"),
     TOKEN_DID_NOT_CREATED: err(401, "token didn't created"),
     EVENT_NOT_FOUND: err(400, "event not found"),
+    SETTING_NOT_FOUND: err(400, "setting not found"),
     CAN_NOT_GET_URL: err(999, "can't get url"),
     CAN_NOT_CREATE_FOLDER: err(999, "can't create folder"),
     CAN_NOT_CHANGE_FILE_NAME:err(999, "can't chenge file name"),
