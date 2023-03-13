@@ -6,13 +6,9 @@ async function connect() {
   try {
     mongoose.connect(
       MONGO_URL,
-      { useNewUrlParser: true, useUnifiedTopology: true },
-      (err) => {
-        if (err) throw "Error DB : " + err;
-
-        console.log(`Connection Success`);
-      }
-    );
+      { useNewUrlParser: true, useUnifiedTopology: true }
+      
+    )
   } catch (error) {
     console.log(error);
     throw error;
