@@ -1,25 +1,25 @@
-const express = require('express'),
-router = express.Router()
-const { getAllEvents, getFilteredEvents } = require('../BL/event.services')
+const express = require("express");
+const eventRouter = express.Router();
+const eventService = require("../BL/event.services");
+const { sendError } = require("../errController");
 
-router.get('/allEvents', async (req,res)=>{
-    try {
-        let data = await getAllEvents()
-        res.send(data)
-    } catch(err) {
-        console.log(err);
-        res.status(err.code ? err.code : 400).send(err.message)
-    }
-})
+// router.post('/event',async (req,res)=>{
+// })
+eventRouter.get("", async (req, res) => {
+  try {
+    const event = await eventService.findEvent();
+    res.status(200).send(event);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+eventRouter.post("/createvent", async (req, res) => {
+  try {
+    const event = await eventService.createNewEvent(req.body);
+    res.status(200).send(event);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
 
-router.get('/filteredEvents', async (req, res)=>{
-    try {
-        let data = await getFilteredEvents(req.body)
-        res.send(data)
-    } catch(err) {
-        console.log(err);
-        res.status(err.code ? err.code : 400).send(err.message)
-    }
-})
-
-module.exports = router
+module.exports = eventRouter;
