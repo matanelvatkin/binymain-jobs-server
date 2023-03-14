@@ -13,8 +13,8 @@ async function createNewEvent(eventData) {
   };
 }
 
-async function findEvent() {
-  const event = eventController.read();
+async function findEvent(filter) {
+  const event = eventController.read(filter);
   return event;
 }
 

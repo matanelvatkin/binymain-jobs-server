@@ -11,4 +11,22 @@ router.get('', async (req,res)=>{
     }
 })
 
+router.get('/categories', async (req,res)=>{
+    try {
+        const data = await getSetting({name: 'category'})
+        res.send(data)
+    } catch(err) {
+        console.log(err);
+    }
+})
+
+router.get('/audiences', async (req,res)=>{
+    try {
+        const data = await getSetting({name: 'audience'})
+        res.send(data)
+    } catch(err) {
+        console.log(err);
+    }
+})
+
 module.exports = router

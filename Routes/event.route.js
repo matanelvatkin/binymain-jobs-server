@@ -7,7 +7,7 @@ const { sendError } = require("../errController");
 // })
 eventRouter.get("", async (req, res) => {
   try {
-    const event = await eventService.findEvent();
+    const event = await eventService.findEvent(req.body ? req.body : {});
     res.status(200).send(event);
   } catch (err) {
     sendError(res, err);
