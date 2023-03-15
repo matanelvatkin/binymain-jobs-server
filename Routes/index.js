@@ -9,5 +9,6 @@ const settingRouter = require("./setting.route");
 mainRouter.use("/event", eventRouter);
 mainRouter.use("/setting", settingRouter);
 mainRouter.use("/files", filesRouter);
+mainRouter.use("/user", userRouter);
 
 module.exports = mainRouter;
