@@ -1,5 +1,4 @@
 const eventController = require("../DL/event.controller");
-require("../Dl/db").connect();
 
 async function createNewEvent(eventData) {
   //   productValidation(eventData);

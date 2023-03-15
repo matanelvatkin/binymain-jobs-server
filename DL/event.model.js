@@ -38,18 +38,18 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
-  // category: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectID,
-  //     ref: "setting",
-  //   },
-  // ],
-  // targetAudience: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectID,
-  //     ref: "setting",
-  //   },
-  // ],
+  category: [
+    {
+      type: mongoose.Schema.Types.ObjectID,
+      ref: "setting",
+    },
+  ],
+  targetAudience: [
+    {
+      type: mongoose.Schema.Types.ObjectID,
+      ref: "setting",
+    },
+  ],
   registrationPageURL: {
     type: String,
     require: false,
