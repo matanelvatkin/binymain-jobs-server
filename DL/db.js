@@ -7,8 +7,7 @@ async function connect() {
     mongoose.connect(
       MONGO_URL,
       { useNewUrlParser: true, useUnifiedTopology: true }
-      
-    )
+    );
   } catch (error) {
     console.log(error);
     throw error;

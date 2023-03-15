@@ -13,13 +13,19 @@ async function createNewEvent(eventData) {
   };
 }
 
-async function findEvent() {
-  const event = eventController.read();
+async function findEvent(filter) {
+  const event = eventController.read(filter);
   return event;
 }
 
+async function findEventByID(id) {
+  const event = eventController.readOne({_id:id});
+  return event;
+}
+
+
 async function eventIsExists(id) {
-  return await eventController.read({ name });
+  return await eventController.read({ id });
 }
 
 let eventData = [
@@ -47,4 +53,7 @@ let eventData = [
 module.exports = {
   createNewEvent,
   findEvent,
+  findEventByID,
 };
+
+// module.exports = { getAllEvents, getFilteredEvents }
