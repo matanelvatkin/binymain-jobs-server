@@ -6,11 +6,11 @@ async function create(data) {
 }
 
 async function read(filter) {
-  return await eventsData.find(filter);
+  return await eventsData.find(filter).populate('setting.settingData');
 }
 
 async function readOne(filter) {
-  const res = await eventsData.findOne(filter);
+  const res = await eventsData.findOne(filter).populate('setting.settingData');
   if (!res) throw errMessage.EVENT_NOT_FOUND;
   return res;
 }
