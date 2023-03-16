@@ -1,19 +1,19 @@
-const userController = require('')
-
-
-
-async function findUser(filter) {
-    
-  }
+const userController = require("../DL/user.controller");
 
 async function createUser(newUserData) {
-    
-  }
+  const newUser = await userController.create(newUserData);
+  return {
+    status: "success",
+    newUser: newUser,
+  };
+}
 
-async function deleteUser(_id) {
-    
-  }
+async function findUserByEmail(email) {
+  const user = userController.find({email: email});
+  return user;
+}
 
-async function updatUser(_id) {
-    
-  }
+module.exports = {
+  createUser,
+  findUserByEmail,
+}
