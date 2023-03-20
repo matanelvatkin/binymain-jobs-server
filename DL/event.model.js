@@ -24,10 +24,9 @@ const eventSchema = new mongoose.Schema({
       // require: true,
     },
   },
-  date: {
+  date: [{
     type: Date,
-    default: Date.now,
-  },
+  }],
   beginningTime: {
     type: String,
   },
@@ -40,27 +39,30 @@ const eventSchema = new mongoose.Schema({
   },
   category: [
     {
-      type: mongoose.Schema.Types.ObjectID,
-      ref: "setting",
+      type: String,
+      //require: true,
     },
   ],
   targetAudience: [
     {
-      type: mongoose.Schema.Types.ObjectID,
-      ref: "setting",
+      type: String,
+      //require: true,
     },
   ],
   registrationPageURL: {
     type: String,
-    require: false,
+    // require: false,
   },
   cardImageURL: {
     type: String,
-    require: true,
+    // require: true,
   },
   coverImageURL: {
     type: String,
     // require: true,
+  },
+  type: {
+    type: String,
   },
   // gallery: [
   //   {
@@ -70,11 +72,6 @@ const eventSchema = new mongoose.Schema({
   //     },
   //   },
   // ],
-  // type: {
-  //   type: String,
-  //   enum: ["one-time", "once-a-week", "once-a-month"],
-  //   default: "one-time",
-  // },
   // payment: {
   //   type: String,
   //   enum: ["free", "in-payment"],

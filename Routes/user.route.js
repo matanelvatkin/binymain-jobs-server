@@ -1,13 +1,13 @@
 const express = require("express");
 const userRouter = express.Router();
-const usetServices = require("../BL/user.services");
+const userServices = require("../BL/user.services");
 const { sendError , errorMsg} = require("../errController");
 
 
 userRouter.get("/findUser", async (req, res) => {
     try {
-      console.log(req.params.email);
-      const user = await usetServices.findUserByEmail(req.params.email);
+      console.log(req);
+      const user = await userServices.findUser(req);
       res.status(200).send(user);
   
     } catch (err) {
@@ -18,8 +18,8 @@ userRouter.get("/findUser", async (req, res) => {
 
 userRouter.post("/creatUser", async (req, res) => {
     try {
-      const user = await usetServices.createUser(req.body);
-      res.status(400).send(user);
+      const user = await userServices.createUser(req.body);
+      res.status(200).send(user);
     } catch (err) {
       sendError(res, err);
     }
