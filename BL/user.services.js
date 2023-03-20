@@ -8,12 +8,12 @@ async function createUser(newUserData) {
   };
 }
 
-async function findUserByEmail(email) {
-  const user = userController.find({email: email});
+async function findUser(phoneNumber) {
+  const user = userController.find({phoneNumber: phoneNumber});
   return user;
 }
 
 module.exports = {
   createUser,
-  findUserByEmail,
+  findUser,
 }
