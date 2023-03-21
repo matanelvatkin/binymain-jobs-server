@@ -8,9 +8,9 @@ async function createUser(newUserData) {
   };
 }
 
-async function findUser(phoneNumber) {
-  const user = userController.find({phoneNumber: phoneNumber});
-  return user;
+async function findUser(user) {
+  const foundUser = await userController.find(user);
+  return foundUser;
 }
 
 module.exports = {

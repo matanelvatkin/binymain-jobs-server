@@ -7,11 +7,19 @@ async function create(data) {
 };
 
 
-async function find(filter) {
-    const res = await userData.findOne(filter).populate('setting.settingData');
-    if (!res) throw errMessage.USER_NOT_FOUND;
-    return res;
-};
+async function find(user) {
+  const { fullName, password } = user;
+  try {
+    const foundUser = await userData.findOne({ fullName });
+    if (foundUser && foundUser.password === password) {
+      return foundUser;
+    } else {
+      throw new Error('Invalid credentials');
+    }
+  } catch (error) {
+    throw new Error('Error finding user');
+  }
+}
 
 
 module.exports = {
