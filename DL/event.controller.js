@@ -1,16 +1,55 @@
 const { errMessage } = require("../errController");
 const eventsData = require("./event.model");
+const settingData = require("./setting.model");
 
 async function create(data) {
   return await eventsData.create(data);
 }
 
 async function read(filter) {
-  return await eventsData.find(filter).populate('setting.settingData');
+  //return await eventsData.find(filter).populate('targetAudience');
+  return await eventsData.find(filter).populate({
+      path: 'targetAudience',
+      model: settingData,
+      select: 'settingData'
+    })
+    .exec((err, events) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log(events);
+      }
+    });
+  
 }
 
 async function readOne(filter) {
-  const res = await eventsData.findOne(filter).populate('setting.settingData');
+  const res = await eventsData.findOne(filter).populate({
+    path: 'targetAudience',
+    model: settingData,
+    select: 'settingData'
+  })
+  .exec((err, events) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(events);
+    }
+  });
+  //   path: 'targetAudience',
+  //   populate: {path: 'settingData'}
+  // });
+    // model: 'setting',
+    // select: 'icon name'
+  
+  // populate: {
+  // path: 'settingData',
+  // select: 'icon name',
+  // }
+//});
+  // model: 'Setting',
+  // select: 'icon name',
+  //});
   if (!res) throw errMessage.EVENT_NOT_FOUND;
   return res;
 }
