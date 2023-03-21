@@ -4,18 +4,6 @@ const userServices = require("../BL/user.services");
 const { sendError , errorMsg} = require("../errController");
 
 
-userRouter.get("/findUser", async (req, res) => {
-    try {
-      console.log(req);
-      const user = await userServices.findUser(req);
-      res.status(200).send(user);
-  
-    } catch (err) {
-      sendError(res, err);
-    }
-  });
-
-
 userRouter.post("/creatUser", async (req, res) => {
     try {
       const user = await userServices.createUser(req.body);
@@ -29,8 +17,14 @@ userRouter.post("/creatUser", async (req, res) => {
 
 // });
 
-// userRouter.put('', async (req, res) => {
-
-// });
+userRouter.post("/login", async (req, res) => {
+  try {
+    const { fullName, password } = req.body;
+    const user = await userServices.findUser({ fullName, password });
+    res.status(200).send(user);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
 
 module.exports = userRouter;
