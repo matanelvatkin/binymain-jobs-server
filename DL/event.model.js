@@ -39,13 +39,13 @@ const eventSchema = new mongoose.Schema({
   },
   category: [
     {
-      type: string,
+      type: String,
       //require: true,
     },
   ],
   targetAudience: [
     {
-      type: string,
+      type: String,
       //require: true,
     },
   ],
