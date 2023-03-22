@@ -2,43 +2,58 @@ const eventController = require("../DL/event.controller");
 
 async function createNewEvent(eventData) {
   var dates = [];
-  var date = eventData.date.split("-");
+  let repeat = 1;
   const days = eventData.day ? getDays(eventData.day) : null;
-  if(eventData.repeat==="שבועי") var repeat= 1;
- else if(eventData.repeat==="דו חודשי") var repeat=7
- else if(eventData.repeat==="חודשי") var repeat=23
   switch (eventData.type) {
     case " אירוע יומי":
-      dates = getDayliDates(
-        new Date(eventData.date),
-        new Date(`${date[0]}-${Number(date[1]) + 3}-${date[2]}`)
-      );
+      repeat = 1;
     case "אירוע שבועי":
-      dates = getWeeklyDates(
-        new Date(eventData.date),
-        new Date(`${date[0]}-${Number(date[1]) + 3}-${date[2]}`)
-      );
-    case "חודשי":
-      dates = getMonthDates(
-        new Date(eventData.date),
-        new Date(`${date[0]}-${Number(date[1]) + 3}-${date[2]}`)
-      );
+      repeat = 7;
     case "בהתאמה אישית":
-      dates = getPersonalDates(
-        new Date(eventData.date),
-        new Date(
-          `${date[0]}-${Number(date[1]) + 3}-${Number(date[2])}`
-        ),
-        days,
-        repeat
-      );
+      if (eventData.repeat === "שבועי") var personalrepeat = 1;
+      else if (eventData.repeat === "דו חודשי") var personalrepeat = 7;
+      else if (eventData.repeat === "חודשי") var personalrepeat = 23;
+      switch (eventData.repeatSettings.type) {
+        case "date":
+          dates = getDatesWithEndDate(
+            new Date(eventData.date),
+            new Date(eventData.repeatSettings.repeatEnd),
+            repeat,
+            days,
+            personalrepeat
+          );
 
-    // await eventController.create(eventData);
+        case "occurrences":
+          dates = getDatesWithNumberOfOccurrences(
+            new Date(eventData.date),
+            eventData.repeatSettings.repeatEnd,
+            repeat,
+            days,
+            personalrepeat
+          );
+      }
+
+    // await eventController.create(evenctData);
   }
   // const newEvent = await eventController.create(eventData);
   return {
-    status: "success",
-    newEvent: "ok",
+    eventName: eventData.eventName,
+    summary: eventData.summary,
+    advertiser: eventData.advertiser,
+    isReapeated:!eventData.repeatType==='אירוע ללא חזרה',
+    repeatType: eventData.repeatType,
+    date: dates,
+    deletedDate:[],
+    days:days,
+    repeatSettings:{type:eventData.repeatSettings.type,repeatEnd:eventData.repeatSettings.repeatEnd},
+    beginningTime: eventData.beginningTime,
+    finishTime: eventData.finishTime,
+    place: eventData.place,
+    category: eventData.category,
+    targetAudience: eventData.targetAudience,
+    registrationPageURL: eventData.registrationPageURL,
+    cardImageURL: eventData.cardImageURL,
+    coverImageURL: eventData.coverImageURL
   };
 }
 const getDays = (days) => {
@@ -62,64 +77,68 @@ const getDays = (days) => {
   });
   return newDays;
 };
-function getWeeklyDates(startDate, endDate) {
+function getDatesWithEndDate(startDate, endDate, repeat, days, personalrepeat) {
   const dates = [];
   let currentDate = new Date(startDate);
   const endDateObj = new Date(endDate);
-  while (currentDate <= endDateObj) {
-    dates.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + 7);
-  }
-
-  return dates;
-}
-function getDayliDates(startDate, endDate) {
-  const dates = [];
-  let currentDate = new Date(startDate);
-  const endDateObj = new Date(endDate);
-
-  while (currentDate <= endDateObj) {
-    dates.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return dates;
-}
-function getPersonalDates(startDate, endDate, days, repeat=1) {
-  const dates = [];
-  let indexInWeek = 1;
-  let push =0;
-  let currentDate = new Date(startDate);
-  const endDateObj = new Date(endDate);
-  while (currentDate <= endDateObj) {
-    days.forEach((day) => {
-      if (push<2&&day === new Date(currentDate).getDay()){
+  if (!personalrepeat) {
+    while (currentDate <= endDateObj) {
       dates.push(new Date(currentDate));
-      push++
-      }
-    });
-    if (indexInWeek < 7) {
-      currentDate.setDate(currentDate.getDate() + 1);
-      indexInWeek++
-    } else {
       currentDate.setDate(currentDate.getDate() + repeat);
-      indexInWeek = 0;
-      push = 0
+    }
+  } else {
+    let push = 0,
+      indexInWeek = 1;
+    while (currentDate <= endDateObj) {
+      days.forEach((day) => {
+        if (push < days.length && day === new Date(currentDate).getDay()) {
+          dates.push(new Date(currentDate));
+          push++;
+        }
+      });
+      if (indexInWeek < 7) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        indexInWeek++;
+      } else {
+        currentDate.setDate(currentDate.getDate() + personalrepeat);
+        indexInWeek = 0;
+        push = 0;
+      }
     }
   }
-  console.log(dates);
   return dates;
 }
-function getMonthDates(startDate, endDate) {
+function getDatesWithNumberOfOccurrences(startDate, endDate, repeat, days, personalrepeat) {
   const dates = [];
   let currentDate = new Date(startDate);
   const endDateObj = new Date(endDate);
-
-  while (currentDate <= endDateObj) {
-    dates.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + 30);
+  if (!personalrepeat) {
+    while (currentDate <= endDateObj && endDate > 0) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + repeat);
+      endDate--;
+    }
+  } else {
+    let push = 0,
+      indexInWeek = 1;
+    while (currentDate <= endDateObj && endDate > 0) {
+      days.forEach((day) => {
+        if (push < days.length && day === new Date(currentDate).getDay()) {
+          dates.push(new Date(currentDate));
+          endDate--;
+          push++;
+        }
+      });
+      if (indexInWeek < 7) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        indexInWeek++;
+      } else {
+        currentDate.setDate(currentDate.getDate() + personalrepeat);
+        indexInWeek = 0;
+        push = 0;
+      }
+    }
   }
-
   return dates;
 }
 async function findEvent(filter) {
