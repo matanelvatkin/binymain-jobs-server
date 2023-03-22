@@ -9,6 +9,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/static",express.static("./upload"))
 
+
 app.use("/api", mainRouter);
 
 
