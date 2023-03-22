@@ -1,5 +1,6 @@
 const { errMessage } = require("../errController");
 const eventsData = require("./event.model");
+const settingData = require("./setting.model");
 
 async function create(data) {
   return await eventsData.create(data);

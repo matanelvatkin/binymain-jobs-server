@@ -39,14 +39,14 @@ const eventSchema = new mongoose.Schema({
   },
   category: [
     {
-      type: String,
-      //require: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "setting.settingData",
     },
   ],
   targetAudience: [
     {
-      type: String,
-      //require: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "setting.settingData",
     },
   ],
   registrationPageURL: {
