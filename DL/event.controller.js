@@ -7,49 +7,11 @@ async function create(data) {
 }
 
 async function read(filter) {
-  //return await eventsData.find(filter).populate('targetAudience');
-  return await eventsData.find(filter).populate({
-      path: 'targetAudience',
-      model: settingData,
-      select: 'settingData'
-    })
-    .exec((err, events) => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(events);
-      }
-    });
-  
+  return await eventsData.find(filter);
 }
 
 async function readOne(filter) {
-  const res = await eventsData.findOne(filter).populate({
-    path: 'targetAudience',
-    model: settingData,
-    select: 'settingData'
-  })
-  .exec((err, events) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log(events);
-    }
-  });
-  //   path: 'targetAudience',
-  //   populate: {path: 'settingData'}
-  // });
-    // model: 'setting',
-    // select: 'icon name'
-  
-  // populate: {
-  // path: 'settingData',
-  // select: 'icon name',
-  // }
-//});
-  // model: 'Setting',
-  // select: 'icon name',
-  //});
+  const res = await eventsData.findOne(filter);
   if (!res) throw errMessage.EVENT_NOT_FOUND;
   return res;
 }
