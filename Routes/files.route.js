@@ -9,7 +9,7 @@ const url = "localhost:5000";
 filesRouter.post("/uploadFile", upload.single("card"), (req, res) => {
   let fileType = req.file.mimetype.split("/")[1];
   let newFileName = req.file.filename + "." + fileType;
-
+  console.log(req.body);
   fs.rename(
     `../upload/${req.file.filename}`,
     `./upload/${newFileName}`,

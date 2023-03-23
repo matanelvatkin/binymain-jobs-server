@@ -24,16 +24,18 @@ const eventSchema = new mongoose.Schema({
       // require: true,
     },
   },
-  isReapeated:{type:Boolean, default:false},
+  isReapeated: { type: Boolean, default: false },
   repeatType: {
     type: String,
   },
-  date: [{
-    type: Date,
-  }],
-  deletedDate:[{type:Date}],
-  days:[{type:Number}],
-  repeatSettings:{type:{type:String},repeatEnd:{type:String}},
+  date: [
+    {
+      type: Date,
+    },
+  ],
+  deletedDate: [{ type: Date }],
+  days: [{ type: Number }],
+  // repeatSettings: { type: { type: String }, repeatEnd: { type: String } },
   beginningTime: {
     type: String,
   },

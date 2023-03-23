@@ -19,18 +19,15 @@ eventRouter.get("/:eventID", async (req, res) => {
     console.log(req.params.eventID);
     const event = await eventService.findEventByID(req.params.eventID);
     res.status(200).send(event);
-
   } catch (err) {
     sendError(res, err);
   }
 });
 
-
-
 eventRouter.post("/createvent", async (req, res) => {
   try {
     const event = await eventService.createNewEvent(req.body);
-    res.send('ok');
+    res.send(event);
   } catch (err) {
     sendError(res, err);
   }

@@ -4,15 +4,15 @@ async function createNewEvent(eventData) {
   var dates = [];
   let repeat = 1;
   const days = eventData.day ? getDays(eventData.day) : null;
-  switch (eventData.type) {
+  switch (eventData.repeatType) {
     case " אירוע יומי":
       repeat = 1;
     case "אירוע שבועי":
       repeat = 7;
     case "בהתאמה אישית":
-      if (eventData.repeat === "שבועי") var personalrepeat = 1;
-      else if (eventData.repeat === "דו חודשי") var personalrepeat = 7;
-      else if (eventData.repeat === "חודשי") var personalrepeat = 23;
+      if (eventData.repeatType === "שבועי") var personalrepeat = 1;
+      else if (eventData.repeatType === "דו חודשי") var personalrepeat = 7;
+      else if (eventData.repeatType === "חודשי") var personalrepeat = 23;
       switch (eventData.repeatSettings.type) {
         case "date":
           dates = getDatesWithEndDate(
@@ -40,12 +40,15 @@ async function createNewEvent(eventData) {
     eventName: eventData.eventName,
     summary: eventData.summary,
     advertiser: eventData.advertiser,
-    isReapeated:!eventData.repeatType==='אירוע ללא חזרה',
+    isReapeated: !eventData.repeatType === "אירוע ללא חזרה",
     repeatType: eventData.repeatType,
     date: dates,
-    deletedDate:[],
-    days:days,
-    repeatSettings:{type:eventData.repeatSettings.type,repeatEnd:eventData.repeatSettings.repeatEnd},
+    deletedDate: [],
+    days: days,
+    // repeatSettings: {
+    //   type: eventData.repeatSettings.type,
+    //   repeatEnd: eventData.repeatSettings.repeatEnd,
+    // },
     beginningTime: eventData.beginningTime,
     finishTime: eventData.finishTime,
     place: eventData.place,
@@ -53,7 +56,7 @@ async function createNewEvent(eventData) {
     targetAudience: eventData.targetAudience,
     registrationPageURL: eventData.registrationPageURL,
     cardImageURL: eventData.cardImageURL,
-    coverImageURL: eventData.coverImageURL
+    coverImageURL: eventData.coverImageURL,
   };
 }
 const getDays = (days) => {
@@ -108,7 +111,13 @@ function getDatesWithEndDate(startDate, endDate, repeat, days, personalrepeat) {
   }
   return dates;
 }
-function getDatesWithNumberOfOccurrences(startDate, endDate, repeat, days, personalrepeat) {
+function getDatesWithNumberOfOccurrences(
+  startDate,
+  endDate,
+  repeat,
+  days,
+  personalrepeat
+) {
   const dates = [];
   let currentDate = new Date(startDate);
   const endDateObj = new Date(endDate);
