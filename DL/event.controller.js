@@ -1,12 +1,13 @@
 const { errMessage } = require("../errController");
 const eventsData = require("./event.model");
+const settingData = require("./setting.model")
 
 async function create(data) {
   return await eventsData.create(data);
 }
 
 async function read(filter) {
-  return await eventsData.find(filter).populate('setting.settingData');
+  return await eventsData.find(filter).populate({path: 'category', model: settingData.settingData})
 }
 
 async function readOne(filter) {
