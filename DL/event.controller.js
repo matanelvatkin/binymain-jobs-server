@@ -7,7 +7,10 @@ async function create(data) {
 }
 
 async function read(filter) {
-  return await eventsData.find(filter);
+  if(filter) {
+    return await eventsData.find(filter).exec()
+  }
+  return await eventsData.find({})
 }
 
 async function readOne(filter) {
