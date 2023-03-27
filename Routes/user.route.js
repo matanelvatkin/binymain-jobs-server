@@ -27,4 +27,16 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
+userRouter.post('/resetPass',async (req,res)=>{
+  try {
+    const { email, code } = req.body;
+    // await userServices.forgetPassword(email,code);
+    console.log(email,code);
+    res.status(200).send("succses")
+
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+})
+
 module.exports = userRouter;
