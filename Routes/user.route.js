@@ -19,8 +19,8 @@ userRouter.post("/creatUser", async (req, res) => {
 
 userRouter.post("/login", async (req, res) => {
   try {
-    const { fullName, password } = req.body;
-    const user = await userServices.findUser({ fullName, password });
+    const { email, password } = req.body;
+    const user = await userServices.findUser({ email, password });
     res.status(200).send(user);
   } catch (err) {
     sendError(res, err);
