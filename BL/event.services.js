@@ -12,7 +12,7 @@ async function createNewEvent(eventData) {
     case "בהתאמה אישית":
       if (eventData.repeatType === "שבועי") var personalrepeat = 1;
       else if (eventData.repeatType === "דו חודשי") var personalrepeat = 7;
-      else if (eventData.repeatType === "חודשי") var personalrepeat = 23;
+      // else if (eventData.repeatType === "חודשי") var personalrepeat = 23;
       switch (eventData.repeatSettings.type) {
         case "date":
           dates = getDatesWithEndDate(
@@ -32,32 +32,10 @@ async function createNewEvent(eventData) {
             personalrepeat
           );
       }
-
-    // await eventController.create(evenctData);
   }
-  // const newEvent = await eventController.create(eventData);
-  return {
-    eventName: eventData.eventName,
-    summary: eventData.summary,
-    advertiser: eventData.advertiser,
-    isReapeated: !eventData.repeatType === "אירוע ללא חזרה",
-    repeatType: eventData.repeatType,
-    date: dates,
-    deletedDate: [],
-    days: days,
-    // repeatSettings: {
-    //   type: eventData.repeatSettings.type,
-    //   repeatEnd: eventData.repeatSettings.repeatEnd,
-    // },
-    beginningTime: eventData.beginningTime,
-    finishTime: eventData.finishTime,
-    place: eventData.place,
-    category: eventData.category,
-    targetAudience: eventData.targetAudience,
-    registrationPageURL: eventData.registrationPageURL,
-    cardImageURL: eventData.cardImageURL,
-    coverImageURL: eventData.coverImageURL,
-  };
+  eventData.date = dates;
+  const newEvent = await eventController.create(eventData);
+  return newEvent;
 }
 const getDays = (days) => {
   const newDays = days.map((day) => {
@@ -170,4 +148,4 @@ module.exports = {
   findEventByID,
 };
 
-// module.exports = { getAllEvents, getFilteredEvents }
+// module.exports = { getAllEvents, getFilteredEvents };

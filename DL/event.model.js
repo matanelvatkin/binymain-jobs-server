@@ -24,7 +24,7 @@ const eventSchema = new mongoose.Schema({
       // require: true,
     },
   },
-  isReapeated: { type: Boolean, default: false },
+  isRepeated: { type: Boolean, default: false },
   repeatType: {
     type: String,
   },
@@ -46,14 +46,16 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
-  category: [
+  categories: [
     {
+      // type: String,
       type: mongoose.Schema.Types.ObjectId,
       ref: "setting.settingData",
     },
   ],
-  targetAudience: [
+  audiences: [
     {
+      // type: String,
       type: mongoose.Schema.Types.ObjectId,
       ref: "setting.settingData",
     },
