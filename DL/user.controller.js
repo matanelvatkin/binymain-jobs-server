@@ -27,8 +27,13 @@ async function find(user) {
   }
 }
 
+async function update(email, newData) {
+  return await userData.updateOne({ email: email}, newData)
+}
+
 
 module.exports = {
     create,
     find,
+    update
 }
