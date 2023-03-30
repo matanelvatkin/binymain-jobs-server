@@ -4,61 +4,41 @@ async function createNewEvent(eventData) {
   var dates = [];
   let repeat = 1;
   const days = eventData.day ? getDays(eventData.day) : null;
-  switch (eventData.type) {
+  switch (eventData.repeatType) {
     case " אירוע יומי":
       repeat = 1;
     case "אירוע שבועי":
       repeat = 7;
-    case "בהתאמה אישית":
-      if (eventData.repeat === "שבועי") var personalrepeat = 1;
-      else if (eventData.repeat === "דו חודשי") var personalrepeat = 7;
-      else if (eventData.repeat === "חודשי") var personalrepeat = 23;
-      switch (eventData.repeatSettings.type) {
-        case "date":
-          dates = getDatesWithEndDate(
-            new Date(eventData.date),
-            new Date(eventData.repeatSettings.repeatEnd),
-            repeat,
-            days,
-            personalrepeat
-          );
-
-        case "occurrences":
-          dates = getDatesWithNumberOfOccurrences(
-            new Date(eventData.date),
-            eventData.repeatSettings.repeatEnd,
-            repeat,
-            days,
-            personalrepeat
-          );
-      }
-
-    // await eventController.create(evenctData);
+      case "בהתאמה אישית":
+      if (eventData.personalRepeat === "שבועי") var personalrepeat = 1;
+      else if (eventData.personalRepeat === "דו חודשי")  var personalrepeat = 7;
+      else if (eventData.personalRepeat === "ללא חזרה") var personalrepeat = 1;
   }
-  // const newEvent = await eventController.create(eventData);
-  return {
-    eventName: eventData.eventName,
-    summary: eventData.summary,
-    advertiser: eventData.advertiser,
-    isReapeated:!eventData.repeatType==='אירוע ללא חזרה',
-    repeatType: eventData.repeatType,
-    date: dates,
-    deletedDate:[],
-    days:days,
-    repeatSettings:{type:eventData.repeatSettings.type,repeatEnd:eventData.repeatSettings.repeatEnd},
-    beginningTime: eventData.beginningTime,
-    finishTime: eventData.finishTime,
-    place: eventData.place,
-    category: eventData.category,
-    targetAudience: eventData.targetAudience,
-    registrationPageURL: eventData.registrationPageURL,
-    cardImageURL: eventData.cardImageURL,
-    coverImageURL: eventData.coverImageURL
-  };
+  if (eventData.repeatSettings.type === "endDate"&&eventData.personalRepeat!=='ללא חזרה') {
+    dates = getDatesWithEndDate(
+      eventData.date,
+      new Date(eventData.repeatSettings.repeatEnd),
+      repeat,
+      days,
+      personalrepeat
+    );
+  } else {
+    dates = getDatesWithNumberOfOccurrences(
+      new Date(eventData.date),
+      eventData.personalRepeat!=='ללא חזרה'?eventData.repeatSettings.repeatEnd:days.length,
+      repeat,
+      days,
+      personalrepeat
+    );
+  }
+  eventData.date = dates;
+  eventData.days = days;
+  const newEvent = await eventController.create(eventData);
+  return newEvent;
 }
 const getDays = (days) => {
   const newDays = days.map((day) => {
-    switch (day) {
+    switch (day.name) {
       case "א":
         return 0;
       case "ב":
@@ -82,6 +62,7 @@ function getDatesWithEndDate(startDate, endDate, repeat, days, personalrepeat) {
   let currentDate = new Date(startDate);
   const endDateObj = new Date(endDate);
   if (!personalrepeat) {
+    console.log(currentDate);
     while (currentDate <= endDateObj) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + repeat);
@@ -108,24 +89,29 @@ function getDatesWithEndDate(startDate, endDate, repeat, days, personalrepeat) {
   }
   return dates;
 }
-function getDatesWithNumberOfOccurrences(startDate, endDate, repeat, days, personalrepeat) {
+function getDatesWithNumberOfOccurrences(
+  startDate,
+  endNumber,
+  repeat,
+  days,
+  personalrepeat
+) {
   const dates = [];
   let currentDate = new Date(startDate);
-  const endDateObj = new Date(endDate);
   if (!personalrepeat) {
-    while (currentDate <= endDateObj && endDate > 0) {
+    while (currentDate && endNumber > 0) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + repeat);
-      endDate--;
+      endNumber--;
     }
   } else {
     let push = 0,
       indexInWeek = 1;
-    while (currentDate <= endDateObj && endDate > 0) {
+    while (currentDate && endNumber > 0) {
       days.forEach((day) => {
         if (push < days.length && day === new Date(currentDate).getDay()) {
           dates.push(new Date(currentDate));
-          endDate--;
+          endNumber--;
           push++;
         }
       });
