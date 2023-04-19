@@ -147,6 +147,3 @@ module.exports = {
   findEvent,
   findEventByID,
 };
-
- module.exports = { getAllEvents, getFilteredEvents }
-
