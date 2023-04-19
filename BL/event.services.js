@@ -152,5 +152,3 @@ module.exports = {
   findEvent,
   findEventByID,
 };
-
-//
