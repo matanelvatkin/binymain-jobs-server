@@ -34,6 +34,7 @@ const eventSchema = new mongoose.Schema({
   deletedDate:[{type:Date}],
   days:[],
   repeatSettings:{type:{type:String},repeatEnd:{type:String}},
+
   beginningTime: {
     type: String,
   },
@@ -44,13 +45,13 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
-  category: [
+  categories: [
     {
       type: String,
       //require: true,
     },
   ],
-  targetAudience: [
+  audiences: [
     {
       type: String,
       //require: true,

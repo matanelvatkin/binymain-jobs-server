@@ -33,6 +33,7 @@ async function createNewEvent(eventData) {
   }
   eventData.date = dates;
   eventData.days = days;
+
   const newEvent = await eventController.create(eventData);
   return newEvent;
 }
@@ -147,4 +148,5 @@ module.exports = {
   findEventByID,
 };
 
-// module.exports = { getAllEvents, getFilteredEvents }
+ module.exports = { getAllEvents, getFilteredEvents }
+
