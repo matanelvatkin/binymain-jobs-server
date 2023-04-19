@@ -1,6 +1,7 @@
 const express = require("express");
 const filesRouter = express.Router();
 const multer = require("multer");
+
 const fs = require("fs");
 
 const uuidv4 = require("uuid/v4");
@@ -59,5 +60,4 @@ filesRouter.post("/uploadFile", upload.array("file"), (req, res) => {
 //   }
 //   buildStaticUrl(req, res);
 // });
-
 module.exports = filesRouter;
