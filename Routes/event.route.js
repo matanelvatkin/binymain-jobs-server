@@ -7,6 +7,7 @@ const fs = require("fs");
 
 const uuidv4 = require("uuid/v4");
 const { sendError } = require("../errController");
+const { log } = require("console");
 const url = "localhost:5000";
 const DIR = "upload";
 
@@ -42,6 +43,11 @@ const upload = multer({
     }
   },
 });
+const multiUpload = upload.fields([
+  { name: "cardImageURL", maxCount: 1 },
+  { name: "coverImageURL", maxCount: 1 },
+  { name: "gallery", maxCount: 5 },
+]);
 // router.post('/event',async (req,res)=>{
 // })
 eventRouter.get("", async (req, res) => {
@@ -63,8 +69,9 @@ eventRouter.get("/:eventID", async (req, res) => {
   }
 });
 
-eventRouter.post("/createvent", upload.array, async (req, res) => {
+eventRouter.post("/createvent", multiUpload, async (req, res) => {
   try {
+    console.log(req.body);
     const event = await eventService.createNewEvent(req.body);
     res.send(event);
   } catch (err) {

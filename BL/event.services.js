@@ -9,12 +9,15 @@ async function createNewEvent(eventData) {
       repeat = 1;
     case "אירוע שבועי":
       repeat = 7;
-      case "בהתאמה אישית":
+    case "בהתאמה אישית":
       if (eventData.personalRepeat === "שבועי") var personalrepeat = 1;
-      else if (eventData.personalRepeat === "דו חודשי")  var personalrepeat = 7;
+      else if (eventData.personalRepeat === "דו חודשי") var personalrepeat = 7;
       else if (eventData.personalRepeat === "ללא חזרה") var personalrepeat = 1;
   }
-  if (eventData.repeatSettings.type === "endDate"&&eventData.personalRepeat!=='ללא חזרה') {
+  if (
+    eventData.repeatSettings.type === "endDate" &&
+    eventData.personalRepeat !== "ללא חזרה"
+  ) {
     dates = getDatesWithEndDate(
       eventData.date,
       new Date(eventData.repeatSettings.repeatEnd),
@@ -25,7 +28,9 @@ async function createNewEvent(eventData) {
   } else {
     dates = getDatesWithNumberOfOccurrences(
       new Date(eventData.date),
-      eventData.personalRepeat!=='ללא חזרה'?eventData.repeatSettings.repeatEnd:days.length,
+      eventData.personalRepeat !== "ללא חזרה"
+        ? eventData.repeatSettings.repeatEnd
+        : days.length,
       repeat,
       days,
       personalrepeat
@@ -148,5 +153,4 @@ module.exports = {
   findEventByID,
 };
 
- module.exports = { getAllEvents, getFilteredEvents }
-
+//
