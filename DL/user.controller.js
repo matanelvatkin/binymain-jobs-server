@@ -38,7 +38,22 @@ async function find(user) {
 }
 
 
+async function findEmail(email) {
+  try {
+    const foundUser = await userData.findOne({email});
+    if (foundUser) {
+      return foundUser
+    } else {
+      throw new Error('Email not found');
+    }
+  } catch (error) {
+    throw new Error('Error finding Email');
+  }
+}
+
+
 module.exports = {
     create,
     find,
+    findEmail,
 }

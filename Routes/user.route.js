@@ -28,4 +28,19 @@ userRouter.post("/login", async (req, res) => {
 });
 
 
+userRouter.post("/verify", async (req, res) => {
+  try {
+    const token = req.body.aoutherizetion;
+    const verifyUser = await userServices.verifyToken(token);
+    if (verifyUser===true){
+    res.status(200).send(verifyUser)
+    }else{
+      return res.status(401)
+    }
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+
 module.exports = userRouter;
