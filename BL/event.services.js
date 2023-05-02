@@ -133,6 +133,13 @@ async function findEvent(filter) {
   return event;
 }
 
+async function findEventsNextNow() {
+
+  const dateNow = new Date()
+  const events =await eventController.read({date:{$gte:dateNow}})
+  return events;
+}
+
 async function findEventByID(id) {
   const event = eventController.readOne({ _id: id });
   return event;
@@ -146,4 +153,5 @@ module.exports = {
   createNewEvent,
   findEvent,
   findEventByID,
+  findEventsNextNow
 };

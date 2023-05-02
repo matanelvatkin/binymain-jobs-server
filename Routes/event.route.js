@@ -3,11 +3,18 @@ const eventRouter = express.Router();
 const eventService = require("../BL/event.services");
 const { sendError } = require("../errController");
 
-// router.post('/event',async (req,res)=>{
-// })
 eventRouter.get("", async (req, res) => {
   try {
     const event = await eventService.findEvent(req.body ? req.body : {});
+    res.status(200).send(event);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+eventRouter.get("/now", async (req, res) => {
+  try {
+    const event = await eventService.findEventsNextNow();
     res.status(200).send(event);
   } catch (err) {
     sendError(res, err);
