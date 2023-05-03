@@ -24,9 +24,17 @@ const eventSchema = new mongoose.Schema({
       // require: true,
     },
   },
+  isReapeated:{type:Boolean, default:false},
+  repeatType: {
+    type: String,
+  },
   date: [{
     type: Date,
   }],
+  deletedDate:[{type:Date}],
+  days:[],
+  repeatSettings:{type:{type:String},repeatEnd:{type:String}},
+
   beginningTime: {
     type: String,
   },
@@ -37,16 +45,16 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
-  category: [
+  categories: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "setting.settingData",
+      type: String,
+      //require: true,
     },
   ],
-  targetAudience: [
+  audiences: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "setting.settingData",
+      type: String,
+      //require: true,
     },
   ],
   registrationPageURL: {
@@ -60,9 +68,6 @@ const eventSchema = new mongoose.Schema({
   coverImageURL: {
     type: String,
     // require: true,
-  },
-  type: {
-    type: String,
   },
   // gallery: [
   //   {

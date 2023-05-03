@@ -4,14 +4,24 @@ const bcrypt = require('bcrypt')
 
 
 async function create(data) {
-    return await userData.create(data);
+  try {
+    const findEmail = await userData.findOne({email:data.email});
+    if (findEmail) {
+      throw new Error('Email alredy in use');
+    } else {
+      return await userData.create(data);
+    }
+  } catch (error) {
+    throw error;
+  }
+   
 };
 
 
 async function find(user) {
-  const { fullName, password } = user;
+  const { email, password } = user;
   try {
-    const foundUser = await userData.findOne({ fullName });
+    const foundUser = await userData.findOne({ email });
     if (foundUser) {
       const isPasswordMatch = await bcrypt.compare(password, foundUser.password);
       if (isPasswordMatch) {

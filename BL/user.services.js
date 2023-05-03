@@ -3,6 +3,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt')
 
 
+const jwt = require('jsonwebtoken');
 
 async function createUser(newUserData) {
   const newUser = await userController.create(newUserData);
@@ -14,7 +15,17 @@ async function createUser(newUserData) {
 
 async function findUser(user) {
   const foundUser = await userController.find(user);
-  return foundUser;
+  if (foundUser) {
+    try {
+      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '10h' });
+      return { user: foundUser, token };
+    } catch (err) {
+      console.error('Error generating Token:', err);
+      return { error: 'Error generating JWT token' };
+    }
+  } else {
+    return { error: 'Invalid credentials' };
+  }
 }
 
 async function forgetPassword(email, code) {
@@ -35,7 +46,7 @@ async function forgetPassword(email, code) {
 }
 
 async function sendEventDetailsToAdvertiser(email, eventDate) {
-  const {eventName,advertiser,date,beginningTime,finishTime,place} = eventDate;
+  const {eventName,summary,advertiser,isReapeated,categories,audiences,registrationPageURL,date,beginningTime,finishTime,place} = eventDate;
   const subject = 'פורסם אירוע חדש - hereEvent'
   const html = `
   <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -43,17 +54,38 @@ async function sendEventDetailsToAdvertiser(email, eventDate) {
     <p>אירוע חדש פורסם על ידך:</p>
     <ul>
     <li>שם האירוע: ${eventName}</li>
-      <li>מפרסם ${advertiser}</li>
+      <li>מפרסם: ${advertiser.name}</li>
+      <li>טלפון: ${advertiser.tel}</li>
+      <li>מייל: ${advertiser.email}</li>
+      <li>אירוע חוזר: ${isReapeated}</li>
+      <li>קטגוריות: ${categories}</li>
+      <li>קהל יעד: ${audiences}</li>
       <li>תאריך האירוע: ${date}</li>
       <li>שעות האירוע: ${beginningTime}-${finishTime}</li>
       <li>מיקום האירוע: ${place}</li>
-      <li>  <a href="https://www.youtube.com/">שינוי פרטי האירוע</a> </li>
+      <li> פרטים נוספים על האירוע: ${summary}</li>
+      <li> דף הרשמה לאירוע: <a href=${registrationPageURL}>${registrationPageURL}</a></li>
      
     </ul>
   </div>`
+  // <li>  <a href="">שינוי פרטי האירוע</a> </li>
+
   await sendMail(email, subject, html)
 
 }
+
+// const eventData = {
+//   eventName:"hi",
+//   summary:"dasasd",
+//   advertiser:{name:"abi",tel:"0543",email:"dasda@das"},
+//   categories:["asd","das","lll"],
+//   audiences:["bbb","bfff","lll"],
+//   registrationPageURL:"https://www.youtube.com",
+//   date:[10/01/11,12/02/12],
+//   beginningTime:"12:00",
+//   finishTime:"13:00",
+//   place:"zxcvvv"
+// }
 
 async function sendMail(email, subject, html) {
   try {
@@ -102,6 +134,7 @@ async function changePassword(email, newPassword) {
 module.exports = {
   createUser,
   findUser,
+  sendEventDetailsToAdvertiser,
   forgetPassword,
   changePassword
 }
