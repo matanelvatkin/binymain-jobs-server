@@ -37,8 +37,27 @@ async function find(user) {
   }
 }
 
+async function read(filter, proj){
+  return await userData.find({filter}, proj);
+}
+
+async function readOne (filter, proj){
+  let res= await read(filter, proj);
+  return res[0]
+
+}
+
+async function update(filter, newData){
+  return await userData.updateOne(filter, newData)
+
+}
+
+
 
 module.exports = {
     create,
     find,
+    read,
+    readOne,
+    update
 }

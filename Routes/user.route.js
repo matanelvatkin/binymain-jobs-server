@@ -31,10 +31,37 @@ userRouter.post("/login", async (req, res) => {
     //   res.status(401).send({ error: 'Invalid credentials' });
     // }
 
+
+  
   } catch (err) {
     sendError(res, err);
   }
 });
+
+
+// userRouter.put("/addFavou", async(req,res)=>{
+//   try{
+//     console.log(req.body);
+//     await userServices.addFavourite(req.body.idEvent, req.body.idUser)
+//     res.send ("success")
+//   }
+//   catch(err){
+// console.log(err)
+//   }
+// })
+
+
+// userRouter.put("/removeFavou", async(req,res)=>{
+//   try{
+//     console.log(req.body);
+//     await userServices.removeFavourite(req.body.idEvent, req.body.idUser)
+//     res.send ("success")
+//   }
+//   catch(err){
+// console.log(err)
+//   }
+// })
+
 
 
 module.exports = userRouter;
