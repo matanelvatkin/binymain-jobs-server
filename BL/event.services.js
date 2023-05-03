@@ -1,4 +1,5 @@
 const eventController = require("../DL/event.controller");
+const eventModel = require("../DL/event.model")
 
 async function createNewEvent(eventData) {
   var dates = [];
@@ -133,10 +134,15 @@ async function findEvent(filter) {
   return event;
 }
 
-async function findEventsNextNow() {
+async function findEventsNextNow(p) {
 
-  const dateNow = new Date()
-  const events =await eventController.read({date:{$gte:dateNow}})
+const dateNow = new Date()
+// const page = p ||"0"
+// const limit= 2
+
+  // const events =await eventController.read({date:{$gte:dateNow}}).limit(2).skip(0)
+  const events = await eventModel.find({date:{$gte:dateNow}})//.limit(limit).skip(limit*page)
+  events.sort((a,b) => (a.date[0] > b.date[0]) ? 1 : ((b.date[0] > a.date[0])?-1:0))
   return events;
 }
 

@@ -12,7 +12,7 @@ eventRouter.get("", async (req, res) => {
   }
 });
 
-eventRouter.get("/now", async (req, res) => {
+eventRouter.get("/home", async (req, res) => {
   try {
     const event = await eventService.findEventsNextNow();
     res.status(200).send(event);
