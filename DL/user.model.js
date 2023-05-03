@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-
+require("./event.model")
 
 const userSchema = new mongoose.Schema({
   fullName: {
@@ -13,6 +13,16 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
   },
+  // favourites:
+  //   [{
+  //     id: {
+  //       type: mongoose.Schema.Types.ObjectId,
+  //     ref: "events"}
+  //       ,
+  //     isFavourite: {
+  //       type: Boolean,
+  //     default: true}
+  // }]
 })
 
 userSchema.pre("save", async function (next) {
