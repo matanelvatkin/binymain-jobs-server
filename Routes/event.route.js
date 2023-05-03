@@ -37,7 +37,7 @@ const upload = multer({
       file.mimetype == "image/jpeg"
     ) {
       cb(null, true);
-      return `${URL}/${DIR}/${file.path}`;
+      return `${req.protocol}://${req.headers.host}/${DIR}/${file.path}`;
     } else {
       cb(null, false);
       return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
@@ -49,8 +49,7 @@ const multiUpload = upload.fields([
   { name: "coverImageURL", maxCount: 1 },
   { name: "gallery", maxCount: 5 },
 ]);
-// router.post('/event',async (req,res)=>{
-// })
+
 eventRouter.post("", async (req, res) => {
   try {
     const event = await eventService.findEvent(req.body ? req.body : {});
@@ -85,18 +84,16 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     const { cardImageURL, coverImageURL, gallery } = req.files;
     const dataEvent = JSON.parse(req.body.values);
     console.dir(dataEvent);
-    // console.log({ carImageURL: cardImageURL[0].path });
-
-    // console.log("dataEvent", dataEvent);
     if (cardImageURL) {
-      dataEvent.cardImageURL = `${URL}/${DIR}/${cardImageURL[0].filename}`;
+      dataEvent.cardImageURL = `${req.protocol}://${req.headers.host}/${DIR}/${cardImageURL[0].filename}`;
     }
     if (coverImageURL) {
-      dataEvent.coverImageURL = `${URL}/${DIR}/${coverImageURL[0].filename}`;
+      dataEvent.coverImageURL = `${req.protocol}://${req.headers.host}/${DIR}/${coverImageURL[0].filename}`;
     }
     if (gallery) {
       dataEvent.gallery = gallery.map(
-        (file) => `${URL}/${DIR}/${file.filename}`
+        (file) =>
+          `${req.protocol}://${req.headers.host}/${DIR}/${file.filename}`
       );
     }
     console.log({ dataEvent });
@@ -107,18 +104,5 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     sendError(res, err);
   }
 });
-
-// eventRouter.post("/createvent", multiUpload, async (req, res) => {
-//   try {
-//     const newFile = req.files.filename;
-//     const dataEvent = req.body.event;
-//     console.log("req.files", req.files);
-//     console.log(newFile);
-//     const event = await eventService.createNewEvent(dataEvent);
-//     res.send(event);
-//   } catch (err) {
-//     sendError(res, err);
-//   }
-// });
 
 module.exports = eventRouter;
