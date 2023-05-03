@@ -15,7 +15,7 @@ async function createNewEvent(eventData) {
       else if (eventData.personalRepeat === "ללא חזרה") var personalrepeat = 1;
   }
   if (
-    eventData.repeatSettings.type === "endDate" &&
+    eventData.repeatSettings?.type === "endDate" &&
     eventData.personalRepeat !== "ללא חזרה"
   ) {
     dates = getDatesWithEndDate(
@@ -68,7 +68,7 @@ function getDatesWithEndDate(startDate, endDate, repeat, days, personalrepeat) {
   let currentDate = new Date(startDate);
   const endDateObj = new Date(endDate);
   if (!personalrepeat) {
-    console.log(currentDate);
+    console.log("currentDate", currentDate);
     while (currentDate <= endDateObj) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + repeat);
