@@ -8,7 +8,7 @@ const cors = require("cors");
 
 app.use(express.json());
 app.use(cors());
-app.use("/static",express.static("./upload"))
+app.use("/upload", express.static("./upload"));
 
 app.use("/api", mainRouter);
 
