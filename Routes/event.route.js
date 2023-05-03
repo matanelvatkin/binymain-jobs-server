@@ -1,6 +1,7 @@
 const express = require("express");
 const eventRouter = express.Router();
 const eventService = require("../BL/event.services");
+const userServices = require("../BL/user.services");
 const { sendError } = require("../errController");
 
 // router.post('/event',async (req,res)=>{

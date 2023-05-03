@@ -27,6 +27,28 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
+userRouter.post('/forgetPassword',async (req,res)=>{
+  try {
+    const { email, code } = req.body;
+    await userServices.forgetPassword(email,code);
+    console.log(email,code);
+    res.status(200).send("succses")
+
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+})
+
+userRouter.post('/resetPassword',async (req,res)=>{
+  try {
+    const { email ,newPassword } = req.body;
+    // await userServices.changePassword(email,newPassword);
+    res.status(200).send("password change")
+
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+})
 
 userRouter.post("/verify", async (req, res) => {
   try {
