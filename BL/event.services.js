@@ -142,6 +142,8 @@ const dateNow = new Date()
 
   // const events =await eventController.read({date:{$gte:dateNow}}).limit(2).skip(0)
   const events = await eventModel.find({date:{$gte:dateNow}})//.limit(limit).skip(limit*page)
+  events.map(v=>v.date)
+  console.log(events);
   events.sort((a,b) => (a.date[0] > b.date[0]) ? 1 : ((b.date[0] > a.date[0])?-1:0))
   return events;
 }
