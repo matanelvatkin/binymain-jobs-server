@@ -1,4 +1,5 @@
 const eventController = require("../DL/event.controller");
+const eventModel = require('../DL/event.model');
 
 async function createNewEvent(eventData) {
   var dates = [];
@@ -133,9 +134,20 @@ function getDatesWithNumberOfOccurrences(
   }
   return dates;
 }
-async function findEvent(filter) {
-  const event = eventController.read(filter);
-  return event;
+
+async function findEvent() {
+  const currentDate = new Date();
+  const filterdEvents = await eventModel.find({ date: { $gte: currentDate } });
+  
+  const futureDates = filterdEvents.map((event) => {
+    const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
+    event.date = futureDates.slice(0, 1);
+    return event;
+  }).filter((event) => event.date.length > 0);
+  
+  futureDates.sort((a, b) => a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0));
+  
+  return futureDates;
 }
 
 async function findEventByID(id) {
