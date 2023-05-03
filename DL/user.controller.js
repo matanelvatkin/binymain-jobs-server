@@ -37,6 +37,10 @@ async function find(user) {
   }
 }
 
+async function update(email, newData) {
+  return await userData.updateOne({ email: email}, newData)
+}
+
 
 async function findEmail(email) {
   try {
@@ -51,9 +55,25 @@ async function findEmail(email) {
   }
 }
 
+async function read(filter, proj){
+  return await userData.find({filter}, proj);
+}
+
+async function readOne (filter, proj){
+  let res= await read(filter, proj);
+  return res[0]
+
+}
+
+async function update(filter, newData){
+  return await userData.updateOne(filter, newData)
+
+}
+
+
 
 module.exports = {
     create,
     find,
-    findEmail,
+    update
 }
