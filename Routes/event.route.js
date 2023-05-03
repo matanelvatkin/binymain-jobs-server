@@ -60,7 +60,7 @@ eventRouter.post("", async (req, res) => {
   }
 });
 
-eventRouter.get("/home", async (req, res) => {
+eventRouter.post("/home", async (req, res) => {
   try {
     const event = await eventService.findEventsNextNow();
     res.status(200).send(event);

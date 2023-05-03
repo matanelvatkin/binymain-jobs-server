@@ -142,14 +142,15 @@ async function findEvent(filter) {
 async function findEventsNextNow(p) {
 
 const dateNow = new Date()
-// const page = p ||"0"
-// const limit= 2
+const page = p ||"0"
+const limit= 10
 
   // const events =await eventController.read({date:{$gte:dateNow}}).limit(2).skip(0)
-  const events = await eventModel.find({date:{$gte:dateNow}})//.limit(limit).skip(limit*page)
-  events.map(v=>v.date)
-  console.log(events);
-  events.sort((a,b) => (a.date[0] > b.date[0]) ? 1 : ((b.date[0] > a.date[0])?-1:0))
+  const events = await eventModel.find({date:{$gte:dateNow}}).sort({date:1}).limit(limit).skip(limit*page)
+  // events.map(v=>{if (v.date.length<1)
+  //   return v.date=v.date[0]})
+  // console.log(events);
+  // events.sort((a,b) => (a.date[0] > b.date[0]) ? 1 : ((b.date[0] > a.date[0])?-1:0))
   return events;
 }
 
