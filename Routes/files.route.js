@@ -1,6 +1,7 @@
 const express = require("express");
 const filesRouter = express.Router();
 const multer = require("multer");
+
 const fs = require("fs");
 const { sendError } = require("../errController");
 const url = "localhost:5000";
@@ -55,5 +56,4 @@ filesRouter.post("/uploadFile", upload.array("file"), (req, res) => {
 //   }
 //   buildStaticUrl(req, res);
 // });
-
 module.exports = filesRouter;
