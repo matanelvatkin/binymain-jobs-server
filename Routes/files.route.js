@@ -3,8 +3,11 @@ const filesRouter = express.Router();
 const multer = require("multer");
 
 const fs = require("fs");
+
+const uuidv4 = require("uuid/v4");
 const { sendError } = require("../errController");
 const url = "localhost:5000";
+const DIR = "upload";
 // const multiUpload = upload.fields([
 //   { name: "cardImageURL", maxCount: 1 },
 //   { name: "coverImageURL", maxCount: 1 },
@@ -13,7 +16,7 @@ const url = "localhost:5000";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "upload");
+    cb(null, DIR);
   },
   filename: (req, file, cb) => {
     const { originalname } = file;
@@ -28,20 +31,21 @@ const storage = multer.diskStorage({
     );
   },
 });
-const upload = multer({ storage });
-// function buildStaticUrl(req, res) {
-//   let fileType = req.file.mimetype.split("/")[1];
-//   let newFileName = req.file.filename + "." + fileType;
-//
-//   console.log(req.body);
-//   fs.rename(
-//     `../upload/${req.file.filename}`,
-//     `./upload/${newFileName}`,
-//     function () {
-//       res.send(`${url}/static/${newFileName}`);
-//     }
-//   );
-// }
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+    }
+  },
+});
 
 filesRouter.post("/uploadFile", upload.array("file"), (req, res) => {
   res.json({ status: "success" });
