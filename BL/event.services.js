@@ -136,20 +136,41 @@ function getDatesWithNumberOfOccurrences(
   return dates;
 }
 
-async function findEvent() {
-  const currentDate = new Date();
-  const filterdEvents = await eventModel.find({ date: { $gte: currentDate } });
-  
-  const futureDates = filterdEvents.map((event) => {
-    const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
-    event.date = futureDates.slice(0, 1);
-    return event;
-  }).filter((event) => event.date.length > 0);
-  
-  futureDates.sort((a, b) => a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0));
-  
+async function findEvent(page, pageSize, currentDate, skipCount = 0) {
+  const filterdEvents = await eventModel
+    .find({ date: { $gte: currentDate } })
+    .sort({ date: 1 })
+    .skip(skipCount)
+    .limit(pageSize);
+
+  const futureDates = filterdEvents
+    .map((event) => {
+      const futureDates = event.date.filter(
+        (date) => new Date(date) >= currentDate
+      );
+      event.date = futureDates.slice(0, 1);
+      return event;
+    }).filter((event) => event.date.length > 0);
+
+  futureDates.sort((a, b) =>
+    a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0)
+  );
+
   return futureDates;
 }
+
+// async function findEvent(page, pageSize) {
+//   const currentDate = new Date();
+//   const skipCount = (page - 1) * pageSize;
+
+//   const filteredEvents = await eventModel
+//     .find({ date: { $gte: currentDate } })
+//     .sort({ date: 1 })
+//     .skip(skipCount)
+//     .limit(pageSize);
+
+//   return filteredEvents;
+// }
 
 async function findEventByID(id) {
   const event = eventController.readOne({ _id: id });
