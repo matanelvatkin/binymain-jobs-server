@@ -1,4 +1,5 @@
 const eventController = require("../DL/event.controller");
+const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
 
 async function createNewEvent(eventData) {
@@ -135,20 +136,41 @@ function getDatesWithNumberOfOccurrences(
   return dates;
 }
 
-async function findEvent() {
-  const currentDate = new Date();
-  const filterdEvents = await eventModel.find({ date: { $gte: currentDate } });
-  
-  const futureDates = filterdEvents.map((event) => {
-    const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
-    event.date = futureDates.slice(0, 1);
-    return event;
-  }).filter((event) => event.date.length > 0);
-  
-  futureDates.sort((a, b) => a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0));
-  
+async function findEvent(page, pageSize, currentDate, skipCount = 0) {
+  const filterdEvents = await eventModel
+    .find({ date: { $gte: currentDate } })
+    .sort({ date: 1 })
+    .skip(skipCount)
+    .limit(pageSize);
+
+  const futureDates = filterdEvents
+    .map((event) => {
+      const futureDates = event.date.filter(
+        (date) => new Date(date) >= currentDate
+      );
+      event.date = futureDates.slice(0, 1);
+      return event;
+    }).filter((event) => event.date.length > 0);
+
+  futureDates.sort((a, b) =>
+    a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0)
+  );
+
   return futureDates;
 }
+
+// async function findEvent(page, pageSize) {
+//   const currentDate = new Date();
+//   const skipCount = (page - 1) * pageSize;
+
+//   const filteredEvents = await eventModel
+//     .find({ date: { $gte: currentDate } })
+//     .sort({ date: 1 })
+//     .skip(skipCount)
+//     .limit(pageSize);
+
+//   return filteredEvents;
+// }
 
 async function findEventByID(id) {
   const event = eventController.readOne({ _id: id });
@@ -159,8 +181,38 @@ async function eventIsExists(id) {
   return await eventController.read({ id });
 }
 
+async function sendEventDetailsToAdvertiser(email, _id) {
+  const eventData =await findEventByID(_id);
+  const {eventName,summary,advertiser,isReapeated,categories,audiences,registrationPageURL,date,beginningTime,finishTime,place} = eventData;
+  const subject = 'פורסם אירוע חדש - hereEvent'
+  const html = `
+  <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+   <h1>פרטי אירוע חדש</h1>
+    <p>אירוע חדש פורסם על ידך:</p>
+    <ul>
+    <li>שם האירוע: ${eventName}</li>
+      <li>מפרסם: ${advertiser.name}</li>
+      <li>טלפון: ${advertiser.tel}</li>
+      <li>מייל: ${advertiser.email}</li>
+      <li>אירוע חוזר: ${isReapeated}</li>
+      <li>קטגוריות: ${categories}</li>
+      <li>קהל יעד: ${audiences}</li>
+      <li>תאריך האירוע: ${date}</li>
+      <li>שעות האירוע: ${beginningTime}-${finishTime}</li>
+      <li>מיקום האירוע: ${place}</li>
+      <li> פרטים נוספים על האירוע: ${summary}</li>
+      <li> דף הרשמה לאירוע: <a href=${registrationPageURL}>${registrationPageURL}</a></li>
+     
+    </ul>
+  </div>`
+  // <li>  <a href="">שינוי פרטי האירוע</a> </li>
+
+  await mailInterface.sendMail(email, subject, html)
+
+}
 module.exports = {
   createNewEvent,
   findEvent,
   findEventByID,
+  sendEventDetailsToAdvertiser
 };
