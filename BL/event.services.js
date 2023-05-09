@@ -156,7 +156,15 @@ async function findEvent(page, pageSize, currentDate, skipCount = 0) {
     a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0)
   );
 
-  return futureDates;
+  const results = {}
+  const endIndex = page * pageSize
+   
+  if(endIndex < await eventModel.find({ date: { $gte: currentDate } }).countDocuments().exec()){
+    results.nextPage =page + 1
+}
+
+results.event = futureDates
+  return results;
 }
 
 // async function findEvent(page, pageSize) {
