@@ -136,10 +136,13 @@ function getDatesWithNumberOfOccurrences(
   return dates;
 }
 
-async function findEvent(page, pageSize, currentDate, skipCount = 0) {
+
+
+
+async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
   const filterdEvents = await eventModel
-    .find({ date: { $gte: currentDate } })
-    .sort({ date: 1 })
+  .find({date: { $gte: currentDate },$or: [{ place: { $regex: search, $options: "i" } },{ eventName: { $regex: search, $options: "i" } } ]})
+  .sort({ date: 1 })
     .skip(skipCount)
     .limit(pageSize);
 
@@ -159,7 +162,7 @@ async function findEvent(page, pageSize, currentDate, skipCount = 0) {
   const results = {}
   const endIndex = page * pageSize
    
-  if(endIndex < await eventModel.find({ date: { $gte: currentDate } }).countDocuments().exec()){
+  if(endIndex < await eventModel.find({date: { $gte: currentDate },$or: [{ place: { $regex: search, $options: "i" } },{ eventName: { $regex: search, $options: "i" } } ]}).countDocuments().exec()){
     results.nextPage =page + 1
 }
 

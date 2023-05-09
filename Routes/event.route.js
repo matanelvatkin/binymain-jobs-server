@@ -52,14 +52,13 @@ const multiUpload = upload.fields([
 
 eventRouter.post("", async (req, res) => {
   try {
-    // console.log(req.body.currentDate);
+    const search = req.body.search || "" ;
     const page = parseInt(req.body.page) || 1;
-    const pageSize = req.body.pageSize || 20 ; // אמור להיות קבוע
+    const pageSize = req.body.pageSize || 5 ; //  אמור להיות קבוע וכרגע נשלח מהקליינט
     const currentDate = req.body.currentDate || new Date();
     const skipCount = (page - 1) * pageSize;
-    const data = await eventService.findEvent(page, pageSize, currentDate, skipCount);
+    const data = await eventService.findEvent(page, pageSize, currentDate, search, skipCount);
     res.status(200).send(data);
-    console.log(skipCount);
   } catch (err) {
     sendError(res, err);
   }
