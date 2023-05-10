@@ -76,7 +76,6 @@ eventRouter.get("/:eventID", async (req, res) => {
 
 eventRouter.post("/createvent", multiUpload, async (req, res) => {
   try {
-    console.log("hello");
     const { cardImageURL, coverImageURL, gallery } = req.files;
     const dataEvent = JSON.parse(req.body.values);
     console.dir(dataEvent);
