@@ -141,8 +141,8 @@ function getDatesWithNumberOfOccurrences(
 
 async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
   const filterdEvents = await eventModel
-  .find({date: { $gte: currentDate },$or: [{ place: { $regex: search, $options: "i" } },{ eventName: { $regex: search, $options: "i" } } ]})
-  .sort({ date: 1 })
+    .find({ date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] })
+    .sort({ date: 1 })
     .skip(skipCount)
     .limit(pageSize);
 
@@ -161,12 +161,12 @@ async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
 
   const results = {}
   const endIndex = page * pageSize
-   
-  if(endIndex < await eventModel.find({date: { $gte: currentDate },$or: [{ place: { $regex: search, $options: "i" } },{ eventName: { $regex: search, $options: "i" } } ]}).countDocuments().exec()){
-    results.nextPage =page + 1
-}
 
-results.event = futureDates
+  if (endIndex < await eventModel.find({ date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] }).countDocuments().exec()) {
+    results.nextPage = page + 1
+  }
+
+  results.event = futureDates
   return results;
 }
 
@@ -183,18 +183,21 @@ results.event = futureDates
 //   return filteredEvents;
 // }
 
-async function findEventByID(id) {
-  const event = eventController.readOne({ _id: id });
+async function findEventByID(id, currentDate) {
+    const event = await eventController.readOne({ _id: id });
+    const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
+  event.date = futureDates.slice(0, 1);
   return event;
 }
+
 
 async function eventIsExists(id) {
   return await eventController.read({ id });
 }
 
 async function sendEventDetailsToAdvertiser(email, _id) {
-  const eventData =await findEventByID(_id);
-  const {eventName,summary,advertiser,isReapeated,categories,audiences,registrationPageURL,date,beginningTime,finishTime,place} = eventData;
+  const eventData = await findEventByID(_id);
+  const { eventName, summary, advertiser, isReapeated, categories, audiences, registrationPageURL, date, beginningTime, finishTime, place } = eventData;
   const subject = 'פורסם אירוע חדש - hereEvent'
   const html = `
   <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

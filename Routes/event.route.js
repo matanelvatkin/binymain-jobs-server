@@ -66,8 +66,9 @@ eventRouter.post("", async (req, res) => {
 
 eventRouter.get("/:eventID", async (req, res) => {
   try {
+    const currentDate = req.body.currentDate || new Date();
     console.log("req.params.eventID", req.params.eventID);
-    const event = await eventService.findEventByID(req.params.eventID);
+    const event = await eventService.findEventByID(req.params.eventID, currentDate);
     res.status(200).send(event);
   } catch (err) {
     sendError(res, err);
