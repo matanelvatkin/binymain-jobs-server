@@ -137,27 +137,27 @@ function getDatesWithNumberOfOccurrences(
 }
 
 
+function pagination (filterModel, page, pageSize){
+  filterModel.skip((page - 1) * pageSize).limit(pageSize)
+  const results = {}
+  const endIndex = page * pageSize
 
+  if (endIndex < filterModel.countDocuments().exec()) {
+    results.nextPage = page + 1
+  }
+
+  results.event = filteredEvents
+  return results;
+}
 
 async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
-  const filterdEvents = await eventModel
-    .find({ date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] })
-    .sort({ date: 1 })
-    .skip(skipCount)
-    .limit(pageSize);
-
-  const futureDates = filterdEvents
-    .map((event) => {
-      const futureDates = event.date.filter(
-        (date) => new Date(date) >= currentDate
-      );
-      event.date = futureDates.slice(0, 1);
-      return event;
-    }).filter((event) => event.date.length > 0);
-
-  futureDates.sort((a, b) =>
-    a.date[0] > b.date[0] ? 1 : (b.date[0] > a.date[0] ? -1 : 0)
-  );
+ const filteredEvents = await eventModel.aggregate([
+      { $match: { date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] } },
+      { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", currentDate] } } } } },
+      { $sort: { date: 1 } },
+      { $skip: skipCount },
+      { $limit: pageSize }
+    ]);
 
   const results = {}
   const endIndex = page * pageSize
@@ -166,22 +166,9 @@ async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
     results.nextPage = page + 1
   }
 
-  results.event = futureDates
+  results.event = filteredEvents
   return results;
 }
-
-// async function findEvent(page, pageSize) {
-//   const currentDate = new Date();
-//   const skipCount = (page - 1) * pageSize;
-
-//   const filteredEvents = await eventModel
-//     .find({ date: { $gte: currentDate } })
-//     .sort({ date: 1 })
-//     .skip(skipCount)
-//     .limit(pageSize);
-
-//   return filteredEvents;
-// }
 
 async function findEventByID(id, currentDate) {
     const event = await eventController.readOne({ _id: id });
