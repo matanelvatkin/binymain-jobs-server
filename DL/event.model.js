@@ -71,6 +71,15 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
+  payment: {
+    isFree :{
+      type: Boolean,
+      default: true
+    },
+    price: {
+      type: Number,
+    }
+  },
   // gallery: [
   //   {
   //     imageURL: {
@@ -79,19 +88,6 @@ const eventSchema = new mongoose.Schema({
   //     },
   //   },
   // ],
-  // payment: {
-  //   type: String,
-  //   enum: ["free", "in-payment"],
-  //   default: "free",
-  //   details: [
-  //     {
-  //       cardType: String,
-  //       price: Number,
-  //       require: false,
-  //     },
-  //   ],
-  //   require: false,
-  // },
   // status: {
   //   type: String,
   //   enum: ["published", "waiting-for-approval", "invalid", "deleted"],
