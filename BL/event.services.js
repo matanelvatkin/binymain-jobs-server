@@ -137,18 +137,18 @@ function getDatesWithNumberOfOccurrences(
 }
 
 
-function pagination (filterModel, page, pageSize){
-  filterModel.skip((page - 1) * pageSize).limit(pageSize)
-  const results = {}
-  const endIndex = page * pageSize
+// function pagination (filterModel, page, pageSize){
+//   filterModel.skip((page - 1) * pageSize).limit(pageSize)
+//   const results = {}
+//   const endIndex = page * pageSize
 
-  if (endIndex < filterModel.countDocuments().exec()) {
-    results.nextPage = page + 1
-  }
+//   if (endIndex < filterModel.countDocuments().exec()) {
+//     results.nextPage = page + 1
+//   }
 
-  results.event = filteredEvents
-  return results;
-}
+//   results.event = filteredEvents
+//   return results;
+// }
 
 async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
  const filteredEvents = await eventModel.aggregate([
