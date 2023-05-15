@@ -17,7 +17,7 @@ async function findUser(user) {
   const foundUser = await userController.find(user);
   if (foundUser) {
     try {
-      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1440h' });
       return { user: foundUser, token };
     } catch (err) {
       console.error('Error generating Token:', err);
@@ -64,7 +64,9 @@ async function verifyToken(token) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if(decoded) {
     const email = decoded.email;
+    console.log(`im email: ${email}`);
     const verifyedUser = await userController.findEmail(email);
+    console.log(`im verifyed user: ${verifyedUser}`);
     return verifyedUser;
     }
   } catch (err) {
