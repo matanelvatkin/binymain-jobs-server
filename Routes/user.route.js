@@ -54,10 +54,10 @@ userRouter.post("/verify", async (req, res) => {
   try {
     const token = req.body.aoutherizetion;
     const verifyUser = await userServices.verifyToken(token);
-    if (verifyUser===true){
+    if (verifyUser){
     res.status(200).send(verifyUser)
     }else{
-      return res.status(401)
+      return res.status(401).send({error: 'Token not valid'});
     }
   } catch (err) {
     sendError(res, err);
