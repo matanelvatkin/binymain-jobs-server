@@ -64,9 +64,7 @@ async function verifyToken(token) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if(decoded) {
     const email = decoded.email;
-    console.log(`im email: ${email}`);
     const verifyedUser = await userController.findEmail(email);
-    console.log(`im verifyed user: ${verifyedUser}`);
     return verifyedUser;
     }
   } catch (err) {
