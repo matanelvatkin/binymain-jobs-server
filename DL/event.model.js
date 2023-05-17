@@ -24,7 +24,7 @@ const eventSchema = new mongoose.Schema({
       // require: true,
     },
   },
-  isReapeated:{type:Boolean, default:false},
+  isReapeated: { type: Boolean, default: false },
   repeatType: {
     type: String,
   },
