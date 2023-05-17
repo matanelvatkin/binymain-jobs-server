@@ -55,7 +55,9 @@ eventRouter.post("", async (req, res) => {
     const search = req.body.search || "" ;
     const page = parseInt(req.body.page) || 1;
     const pageSize = req.body.pageSize || 5 ; //  אמור להיות קבוע וכרגע נשלח מהקליינט
-    const currentDate = req.body.currentDate || new Date();
+    const DateNow = new Date();
+    const currentDateDefault= DateNow.setHours(0,0,0,0);
+    const currentDate = req.body.currentDate || currentDateDefault
     const skipCount = (page - 1) * pageSize;
     const data = await eventService.findEvent(page, pageSize, currentDate, search, skipCount);
     res.status(200).send(data);
