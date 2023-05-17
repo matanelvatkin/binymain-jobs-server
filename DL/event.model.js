@@ -88,11 +88,11 @@ const eventSchema = new mongoose.Schema({
   //     },
   //   },
   // ],
-  // status: {
-  //   type: String,
-  //   enum: ["published", "waiting-for-approval", "invalid", "deleted"],
-  //   default: "waiting-for-approval",
-  // },
+  status: {
+    type: String,
+    enum: ["published", "waiting-for-approval", "invalid", "deleted"],
+    default: "waiting-for-approval",
+  },
 });
 
 const events = mongoose.model("event", eventSchema);
