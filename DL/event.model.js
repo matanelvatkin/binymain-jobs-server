@@ -72,13 +72,13 @@ const eventSchema = new mongoose.Schema({
     // require: true,
   },
   payment: {
-    isFree :{
+    isFree: {
       type: Boolean,
-      default: true
+      default: true,
     },
     price: {
       type: Number,
-    }
+    },
   },
   // gallery: [
   //   {
