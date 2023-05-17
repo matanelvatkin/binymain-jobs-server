@@ -74,6 +74,16 @@ eventRouter.get("/:eventID", async (req, res) => {
   }
 });
 
+
+eventRouter.put("/:eventID", async (req, res) => {
+  try {
+    const event = await eventService.updateStatusEvent(req.params.eventID, req.body);
+    res.status(200).send(event);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
 eventRouter.post("/createvent", multiUpload, async (req, res) => {
   try {
     const { cardImageURL, coverImageURL, gallery } = req.files;
