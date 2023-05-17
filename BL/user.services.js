@@ -13,11 +13,14 @@ async function createUser(newUserData) {
   };
 }
 
+
 async function findUser(user) {
   const foundUser = await userController.find(user);
   if (foundUser) {
     try {
-      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ email: user.email },
+         process.env.JWT_SECRET, 
+         { expiresIn: '1440h' });
       return { user: foundUser, token };
     } catch (err) {
       console.error('Error generating Token:', err);
@@ -27,6 +30,7 @@ async function findUser(user) {
     return { error: 'Invalid credentials' };
   }
 }
+ 
 
 async function forgetPassword(email, code) {
   const subject = 'Forget Password'
