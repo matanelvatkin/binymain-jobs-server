@@ -75,5 +75,6 @@ async function update(filter, newData){
 module.exports = {
     create,
     find,
-    update
+    update,
+    findEmail
 }

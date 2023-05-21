@@ -28,12 +28,14 @@ const eventSchema = new mongoose.Schema({
   repeatType: {
     type: String,
   },
-  date: [{
-    type: Date,
-  }],
-  deletedDate:[{type:Date}],
-  days:[],
-  repeatSettings:{type:{type:String},repeatEnd:{type:String}},
+  date: [
+    {
+      type: Date,
+    },
+  ],
+  deletedDate: [{ type: Date }],
+  days: [],
+  repeatSettings: { type: { type: String }, repeatEnd: { type: String } },
 
   beginningTime: {
     type: String,
@@ -69,32 +71,28 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
+  payment: {
+    isFree: {
+      type: Boolean,
+      default: true,
+    },
+    price: {
+      type: Number,
+    },
+  },
   // gallery: [
   //   {
   //     imageURL: {
-  //       type: String,
+  //       type: Array,
   //       require: false,
   //     },
   //   },
   // ],
-  // payment: {
-  //   type: String,
-  //   enum: ["free", "in-payment"],
-  //   default: "free",
-  //   details: [
-  //     {
-  //       cardType: String,
-  //       price: Number,
-  //       require: false,
-  //     },
-  //   ],
-  //   require: false,
-  // },
-  // status: {
-  //   type: String,
-  //   enum: ["published", "waiting-for-approval", "invalid", "deleted"],
-  //   default: "waiting-for-approval",
-  // },
+  status: {
+    type: String,
+    enum: ["published", "waiting-for-approval", "invalid", "deleted"],
+    default: "waiting-for-approval",
+  },
 });
 
 const events = mongoose.model("event", eventSchema);

@@ -5,6 +5,11 @@ const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
 const { sendError } = require("../errController");
+const ADMIN_MAIL = process.env.ADMIN_MAIL;
+const uuidv4 = require("uuid/v4");
+const { sendError } = require("../errController");
+const { log } = require("console");
+const { sendMail } = require("../BL/emailInterface");
 const URL = "localhost:5000";
 const DIR = "upload";
 cloudinary.config({
@@ -39,7 +44,7 @@ const upload = multer({
       file.mimetype == "image/jpeg"
     ) {
       cb(null, true);
-      return `${URL}/${DIR}/${file.path}`;
+      return `${req.protocol}://${req.headers.host}/${DIR}/${file.path}`;
     } else {
       cb(null, false);
       return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
@@ -51,12 +56,22 @@ const multiUpload = upload.fields([
   { name: "coverImageURL", maxCount: 1 },
   { name: "gallery", maxCount: 5 },
 ]);
-// router.post('/event',async (req,res)=>{
-// })
+
 eventRouter.post("", async (req, res) => {
   try {
-    const event = await eventService.findEvent(req.body ? req.body : {});
-    res.status(200).send(event);
+    const search = req.body.search || "";
+    const page = parseInt(req.body.page) || 1;
+    const pageSize = req.body.pageSize || 5; //  אמור להיות קבוע וכרגע נשלח מהקליינט
+    const currentDate = req.body.currentDate || new Date();
+    const skipCount = (page - 1) * pageSize;
+    const data = await eventService.findEvent(
+      page,
+      pageSize,
+      currentDate,
+      search,
+      skipCount
+    );
+    res.status(200).send(data);
   } catch (err) {
     sendError(res, err);
   }
@@ -64,8 +79,23 @@ eventRouter.post("", async (req, res) => {
 
 eventRouter.get("/:eventID", async (req, res) => {
   try {
-    console.log("req.params.eventID", req.params.eventID);
-    const event = await eventService.findEventByID(req.params.eventID);
+    const currentDate = req.body.currentDate || new Date();
+    const event = await eventService.findEventByID(
+      req.params.eventID,
+      currentDate
+    );
+    res.status(200).send(event);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+eventRouter.put("/:eventID", async (req, res) => {
+  try {
+    const event = await eventService.updateStatusEvent(
+      req.params.eventID,
+      req.body
+    );
     res.status(200).send(event);
   } catch (err) {
     sendError(res, err);
@@ -100,22 +130,14 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     const event = await eventService.createNewEvent(dataEvent);
     res.send(event);
     //TODO: send to email function
+    sendMail(
+      ADMIN_MAIL,
+      "אירוע חדש לאישור",
+      `https://server-vike.vercel.app/viewEvent/${event._id}`
+    );
   } catch (err) {
     sendError(res, err);
   }
 });
-
-// eventRouter.post("/createvent", multiUpload, async (req, res) => {
-//   try {
-//     const newFile = req.files.filename;
-//     const dataEvent = req.body.event;
-//     console.log("req.files", req.files);
-//     console.log(newFile);
-//     const event = await eventService.createNewEvent(dataEvent);
-//     res.send(event);
-//   } catch (err) {
-//     sendError(res, err);
-//   }
-// });
 
 module.exports = eventRouter;

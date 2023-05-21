@@ -17,6 +17,6 @@ app.use("/api", mainRouter);
 // res.send("hello world")
 // });
 app.listen(PORT, () => {
-  if(!fs.existsSync("./upload")) fs.mkdirSync("./upload");
+  if (!fs.existsSync("./upload")) fs.mkdirSync("./upload");
   console.log("Server is running : listening to port " + PORT);
 });
