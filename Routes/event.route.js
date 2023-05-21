@@ -1,15 +1,17 @@
 const express = require("express");
 const eventRouter = express.Router();
 const eventService = require("../BL/event.services");
-// const { sendError } = require("../errController");
 const multer = require("multer");
 const fs = require("fs");
-
-const uuidv4 = require("uuid/v4");
+const cloudinary = require("cloudinary").v2;
 const { sendError } = require("../errController");
-const { log } = require("console");
 const URL = "localhost:5000";
 const DIR = "upload";
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -72,22 +74,26 @@ eventRouter.get("/:eventID", async (req, res) => {
 
 eventRouter.post("/createvent", multiUpload, async (req, res) => {
   try {
-    console.log(req.protocol+":\\\\"+req.headers.host);
     const { cardImageURL, coverImageURL, gallery } = req.files;
     const dataEvent = JSON.parse(req.body.values);
-    console.dir(dataEvent);
-    // console.log({ carImageURL: cardImageURL[0].path });
 
-    // console.log("dataEvent", dataEvent);
     if (cardImageURL) {
-      dataEvent.cardImageURL = `${URL}/${DIR}/${cardImageURL[0].filename}`;
+      const result = await cloudinary.uploader.upload(cardImageURL[0].path, {
+        folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/cardImageURL",
+      });
+      dataEvent.cardImageURL = result.secure_url
     }
     if (coverImageURL) {
-      dataEvent.coverImageURL = `${URL}/${DIR}/${coverImageURL[0].filename}`;
+      const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
+        folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/coverImageURL",
+      });
+      dataEvent.coverImageURL = result.secure_url
     }
     if (gallery) {
-      dataEvent.gallery = gallery.map(
-        (file) => `${URL}/${DIR}/${file.filename}`
+      dataEvent.gallery = gallery.map(async file=>
+        await cloudinary.uploader.upload(file.path, {
+          folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/gallery",
+        })
       );
     }
     console.log({ dataEvent });
