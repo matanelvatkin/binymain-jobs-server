@@ -4,7 +4,6 @@ const eventService = require("../BL/event.services");
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
-const { sendError } = require("../errController");
 const ADMIN_MAIL = process.env.ADMIN_MAIL;
 const uuidv4 = require("uuid/v4");
 const { sendError } = require("../errController");
