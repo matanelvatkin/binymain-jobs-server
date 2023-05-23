@@ -72,13 +72,13 @@ const eventSchema = new mongoose.Schema({
     // require: true,
   },
   payment: {
-    isFree :{
+    isFree: {
       type: Boolean,
-      default: true
+      default: true,
     },
     price: {
       type: Number,
-    }
+    },
   },
   // gallery: [
   //   {
@@ -88,11 +88,11 @@ const eventSchema = new mongoose.Schema({
   //     },
   //   },
   // ],
-  // status: {
-  //   type: String,
-  //   enum: ["published", "waiting-for-approval", "invalid", "deleted"],
-  //   default: "waiting-for-approval",
-  // },
+  status: {
+    type: String,
+    enum: ["published", "waiting-for-approval", "invalid", "deleted"],
+    default: "waiting-for-approval",
+  },
 });
 
 const events = mongoose.model("event", eventSchema);

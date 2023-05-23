@@ -184,6 +184,11 @@ async function findEventByID(id, currentDate) {
   return event;
 }
 
+async function updateStatusEvent(id, newData) {
+    const event = await eventController.update(id, newData);
+  return event;
+}
+
 
 async function eventIsExists(id) {
   return await eventController.read({ id });
@@ -222,5 +227,6 @@ module.exports = {
   createNewEvent,
   findEvent,
   findEventByID,
-  sendEventDetailsToAdvertiser
+  sendEventDetailsToAdvertiser,
+  updateStatusEvent
 };

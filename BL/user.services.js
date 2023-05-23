@@ -13,11 +13,14 @@ async function createUser(newUserData) {
   };
 }
 
+
 async function findUser(user) {
   const foundUser = await userController.find(user);
   if (foundUser) {
     try {
-      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1440h' });
+      const token = jwt.sign({ email: user.email },
+         process.env.JWT_SECRET, 
+         { expiresIn: '1440h' });
       return { user: foundUser, token };
     } catch (err) {
       console.error('Error generating Token:', err);
@@ -27,6 +30,7 @@ async function findUser(user) {
     return { error: 'Invalid credentials' };
   }
 }
+ 
 
 async function forgetPassword(email, code) {
   const subject = 'Forget Password'
@@ -47,13 +51,16 @@ async function forgetPassword(email, code) {
 
 async function updateUser(data) {
   const { email, newData } = data;
-  return await userDL.update(email, newData);
+  return await userController.update(email, newData);
 }
 
 async function changePassword(email, newPassword) {
   try {
     const pass = bcrypt.hashSync(newPassword, 10)
-    updateUser({ email: email, newData: { password: pass } })
+    const changed = updateUser({ email: email, newData: { password: pass } })
+    if (changed) {
+      return pass;
+    }
   } catch (error) {
     throw { message: error.message }
   }

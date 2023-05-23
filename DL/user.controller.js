@@ -65,10 +65,10 @@ async function readOne (filter, proj){
 
 }
 
-async function update(filter, newData){
-  return await userData.updateOne(filter, newData)
+// async function update(filter, newData){
+//   return await userData.updateOne(filter, newData)
 
-}
+// }
 
 
 
