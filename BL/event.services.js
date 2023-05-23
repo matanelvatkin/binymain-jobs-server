@@ -2,9 +2,16 @@ const eventController = require("../DL/event.controller");
 const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
 
+// $dateToString: {
+//   date: "$createdAt",
+//   format: "%Y-%m-%d %H:%M:%S",
+//   timezone: "+03"
+// }
+
 async function createNewEvent(eventData) {
   var dates = [];
   let repeat = 1;
+  console.log(eventData.date);
   const days = eventData.day ? getDays(eventData.day) : null;
   switch (eventData.repeatType) {
     case " אירוע יומי":
