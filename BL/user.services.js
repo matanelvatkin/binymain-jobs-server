@@ -51,13 +51,16 @@ async function forgetPassword(email, code) {
 
 async function updateUser(data) {
   const { email, newData } = data;
-  return await userDL.update(email, newData);
+  return await userController.update(email, newData);
 }
 
 async function changePassword(email, newPassword) {
   try {
     const pass = bcrypt.hashSync(newPassword, 10)
-    updateUser({ email: email, newData: { password: pass } })
+    const changed = updateUser({ email: email, newData: { password: pass } })
+    if (changed) {
+      return pass;
+    }
   } catch (error) {
     throw { message: error.message }
   }

@@ -114,9 +114,15 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
           "/" +
           dataEvent.eventName +
           "/cardImageURL",
+        transformation: [
+          { aspect_ratio: "1.0", crop: "fill" },
+          { quality: "auto" },
+          { fetch_format: "auto" },
+        ],
       });
       dataEvent.cardImageURL = result.secure_url;
     }
+    ``;
     if (coverImageURL) {
       const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
         folder:
@@ -124,6 +130,11 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
           "/" +
           dataEvent.eventName +
           "/coverImageURL",
+        transformation: [
+          { aspect_ratio: "1.77778", crop: "fill" },
+          { quality: "auto" },
+          { fetch_format: "auto" },
+        ],
       });
       dataEvent.coverImageURL = result.secure_url;
     }
