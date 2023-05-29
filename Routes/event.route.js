@@ -155,6 +155,8 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     res.send(event);
     console.log(event);
     //TODO: send to email function
+    // eventService.sendEventDetailsToAdvertiser(event.advertiser.email,event._id);
+
     sendMail(
       ADMIN_MAIL,
       "אירוע חדש לאישור",

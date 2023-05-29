@@ -1,6 +1,7 @@
 const eventController = require("../DL/event.controller");
 const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
+const settingService = require("../BL/setting.services");
 
 async function createNewEvent(eventData) {
   var dates = [];
@@ -170,56 +171,81 @@ async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
   return results;
 }
 
-async function findEventByID(id, currentDate) {
-    const event = await eventController.readOne({ _id: id });
-    const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
-  event.date = futureDates.slice(0, 1);
+async function findEventById(id) {
+  const event = await eventController.readOne({ _id: id });
   return event;
+}
+
+async function findEventByID(id, currentDate) {
+  const event = await eventController.readOne({ _id: id });
+  const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
+event.date = futureDates.slice(0, 1);
+return event;
 }
 
 async function updateStatusEvent(id, newData) {
-    const event = await eventController.update(id, newData);
-  return event;
+    const updateEvent = await eventController.update(id, newData);
+    const event = await findEventById(id);
+    console.log("eventtttt",event);
+    sendEventDetailsToAdvertiser(event.advertiser.email,event._id)
+    return updateEvent;
 }
-
 
 async function eventIsExists(id) {
   return await eventController.read({ id });
 }
 
 async function sendEventDetailsToAdvertiser(email, _id) {
-  const eventData = await findEventByID(_id);
-  const { eventName, summary, advertiser, isReapeated, categories, audiences, registrationPageURL, date, beginningTime, finishTime, place } = eventData;
+  const eventData = await findEventById(_id);
+  const { eventName, summary, advertiser, categories, audiences, registrationPageURL, date, beginningTime, finishTime, place,cardImageURL,coverImageURL } = eventData;
+
+  const categoriesNames = await settingService.getCategorysNames(categories)
+  const audiencesNames = await settingService.getAudiencesNames(audiences)
+  const dateTimeString = await date.map(v=>new Date(v).toLocaleDateString('en-US')).join(', ')
+
   const subject = 'פורסם אירוע חדש - hereEvent'
   const html = `
-  <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-   <h1>פרטי אירוע חדש</h1>
+<div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
+  <h1 style="color: #333; text-align: center;">פרטי אירוע חדש</h1>
+  <div style="background-color: #fff; padding: 20px; border-radius: 5px;">
     <p>אירוע חדש פורסם על ידך:</p>
-    <ul>
-    <li>שם האירוע: ${eventName}</li>
-      <li>מפרסם: ${advertiser.name}</li>
-      <li>טלפון: ${advertiser.tel}</li>
-      <li>מייל: ${advertiser.email}</li>
-      <li>אירוע חוזר: ${isReapeated}</li>
-      <li>קטגוריות: ${categories}</li>
-      <li>קהל יעד: ${audiences}</li>
-      <li>תאריך האירוע: ${date}</li>
-      <li>שעות האירוע: ${beginningTime}-${finishTime}</li>
-      <li>מיקום האירוע: ${place}</li>
-      <li> פרטים נוספים על האירוע: ${summary}</li>
-      <li> דף הרשמה לאירוע: <a href=${registrationPageURL}>${registrationPageURL}</a></li>
-     
-    </ul>
-  </div>`
-  // <li>  <a href="">שינוי פרטי האירוע</a> </li>
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: #333;">${eventName}</h3>
+      <p><strong>מפרסם:</strong> ${advertiser.name}</p>
+      <p><strong>טלפון:</strong> ${advertiser.tel}</p>
+      <p><strong>מייל:</strong> ${advertiser.email}</p>
+    </div>
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: #333;">פרטים על האירוע:</h3>
+      <p><strong>קטגוריות:</strong> ${categoriesNames.join(', ')}</p>
+      <p><strong>קהל יעד:</strong> ${audiencesNames.join(', ')}</p>
+      <p><strong>תאריך האירוע:</strong> ${dateTimeString}</p>
+      <p><strong>שעות האירוע:</strong> ${beginningTime}-${finishTime}</p>
+      <p><strong>מיקום האירוע:</strong> ${place}</p>
+      <p><strong>תיאור האירוע:</strong> ${summary}</p>
+      <p><strong>דף הרשמה לאירוע:</strong> <a href="${registrationPageURL}">${registrationPageURL}</a></p>
+    </div>
+    <div>
+      <h3 style="color: #333;">תמונות:</h3>
+      <div style="display: flex; justify-content: space-between;">
+        <img src="${cardImageURL}" alt="Image 1" width="100" height="100" style="margin-right: 10px;">
+        <img src="${coverImageURL}" alt="Image 2" width="100" height="100" style="margin-left: 10px;">
+      </div>
+    </div>
+  </div>
+</div>`
 
   await mailInterface.sendMail(email, subject, html)
 
 }
+
+
+
 module.exports = {
   createNewEvent,
   findEvent,
   findEventByID,
+  findEventById,
   sendEventDetailsToAdvertiser,
   updateStatusEvent
 };
