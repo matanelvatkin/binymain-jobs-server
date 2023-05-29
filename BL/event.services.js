@@ -190,8 +190,6 @@ async function updateStatusEvent(id, newData) {
     sendEventDetailsToAdvertiser(event.advertiser.email,event._id)
     return updateEvent;
 }
-// updateStatusEvent("6473a1ae47f64d0ea39712c4", { status: "published" })
-
 
 async function eventIsExists(id) {
   return await eventController.read({ id });
@@ -204,8 +202,6 @@ async function sendEventDetailsToAdvertiser(email, _id) {
   const categoriesNames = await settingService.getCategorysNames(categories)
   const audiencesNames = await settingService.getAudiencesNames(audiences)
   const dateTimeString = await date.map(v=>new Date(v).toLocaleDateString('en-US')).join(', ')
-
-  // const dateString = dateArray.join(', '); // Join the individual date strings with a separator (e.g., comma)
 
   const subject = 'פורסם אירוע חדש - hereEvent'
   const html = `
@@ -239,15 +235,10 @@ async function sendEventDetailsToAdvertiser(email, _id) {
   </div>
 </div>`
 
-  //  <li>אירוע חוזר: ${isReapeated}</li>
-  // <li>  <a href="">שינוי פרטי האירוע</a> </li>
-
   await mailInterface.sendMail(email, subject, html)
 
 }
 
-sendEventDetailsToAdvertiser('chatappsapir@gmail.com',"6474448a539c7a35b81cd23a")
-// settingService.getCategorysNames(["641189cf3d762f6a181064c7","641189cf3d762f6a181064c8"])
 
 
 module.exports = {
