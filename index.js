@@ -19,4 +19,10 @@ app.use("/api", mainRouter);
 app.listen(PORT, () => {
   if (!fs.existsSync("./upload")) fs.mkdirSync("./upload");
   console.log("Server is running : listening to port " + PORT);
+//   console.log(new Date());
+// const date = new Date();
+// const options = { timeZone: 'Asia/Jerusalem' };
+// console.log(date.toLocaleString('he-IL', options));
+// console.log(options)
+
 });

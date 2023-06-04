@@ -1,17 +1,12 @@
 const eventController = require("../DL/event.controller");
 const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
-
-// $dateToString: {
-//   date: "$createdAt",
-//   format: "%Y-%m-%d %H:%M:%S",
-//   timezone: "+03"
-// }
+const { query } = require("express");
 
 async function createNewEvent(eventData) {
+  console.log(eventData.date, "- start", typeof(eventData.date));
   var dates = [];
   let repeat = 1;
-  console.log(eventData.date);
   const days = eventData.day ? getDays(eventData.day) : null;
   switch (eventData.repeatType) {
     case " אירוע יומי":
@@ -47,6 +42,8 @@ async function createNewEvent(eventData) {
   }
   eventData.date = dates;
   eventData.days = days;
+
+  console.log(eventData.date, "- end");
 
   const newEvent = await eventController.create(eventData);
   return newEvent;
@@ -157,19 +154,26 @@ function getDatesWithNumberOfOccurrences(
 //   return results;
 // }
 
-async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
+  
+// console.log(new Date(1685743303316),"last-date");
+// console.log(currentDate,"currentDate");
+async function findEvent(page, pageSize, currentDate, search, skipCount) {
+  const endDate = new Date("2023-06-04T17:50:59.109Z")
+  console.log(endDate,"last-date");
  const filteredEvents = await eventModel.aggregate([
-      { $match: { date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] } },
+      { $match: { $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate , $lte : endDate } }},
       { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", currentDate] } } } } },
       { $sort: { date: 1 } },
       { $skip: skipCount },
       { $limit: pageSize }
     ]);
+// console.log(filteredEvents,"filteredEvents");
 
   const results = {}
   const endIndex = page * pageSize
 
-  if (endIndex < await eventModel.find({ date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] }).countDocuments().exec()) {
+  if (endIndex < await eventModel.find({ $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate , $lt : endDate } 
+}).countDocuments().exec()) {
     results.nextPage = page + 1
   }
 

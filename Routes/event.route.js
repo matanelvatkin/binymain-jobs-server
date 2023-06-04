@@ -58,6 +58,9 @@ const multiUpload = upload.fields([
 
 eventRouter.post("", async (req, res) => {
   try {
+    if(!req.body.pageSize){console.log("req--start++",req.body.singleEventsFilter,"req---end")}
+    const queryAdvance = req.body.singleEventsFilter
+    console.log(queryAdvance,"queryAdvance");
     const search = req.body.search || "";
     const page = parseInt(req.body.page) || 1;
     const pageSize = req.body.pageSize || 5; //  אמור להיות קבוע וכרגע נשלח מהקליינט
@@ -68,7 +71,7 @@ eventRouter.post("", async (req, res) => {
       pageSize,
       currentDate,
       search,
-      skipCount
+      skipCount,
     );
     res.status(200).send(data);
   } catch (err) {
