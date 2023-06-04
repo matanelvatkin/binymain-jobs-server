@@ -112,12 +112,22 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     if (cardImageURL) {
       const result = await cloudinary.uploader.upload(cardImageURL[0].path, {
         folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/cardImageURL",
+        transformation: [
+          {aspect_ratio: "1.0", crop: "fill"},
+          {quality: "auto"},
+          {fetch_format: "auto"}
+          ],
       });
       dataEvent.cardImageURL = result.secure_url
-    }
+    }``
     if (coverImageURL) {
       const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
         folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/coverImageURL",
+        transformation: [
+          {aspect_ratio: "1.77778", crop: "fill"},
+          {quality: "auto"},
+          {fetch_format: "auto"}
+          ],
       });
       dataEvent.coverImageURL = result.secure_url
     }
@@ -132,6 +142,8 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     const event = await eventService.createNewEvent(dataEvent);
     res.send(event);
     //TODO: send to email function
+    // eventService.sendEventDetailsToAdvertiser(event.advertiser.email,event._id);
+
     sendMail(
       ADMIN_MAIL,
       "אירוע חדש לאישור",
