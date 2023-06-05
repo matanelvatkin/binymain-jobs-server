@@ -93,6 +93,14 @@ const eventSchema = new mongoose.Schema({
     enum: ["published", "waiting-for-approval", "invalid", "deleted"],
     default: "waiting-for-approval",
   },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  publishedAt: {
+    type: Date,
+    default: null
+  }
 });
 
 const events = mongoose.model("event", eventSchema);
