@@ -69,7 +69,31 @@ eventRouter.post("", async (req, res) => {
       pageSize,
       currentDate,
       search,
-      skipCount
+      skipCount,
+    );
+    res.status(200).send(data);
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+eventRouter.post("/search", async (req, res) => {
+  try {
+    const location = req.body.location || "";
+    const btnDates = req.body.btnDates || "";
+    const categories = req.body.categories || [];
+    const audiences = req.body.audiences || [];
+    const page = parseInt(req.body.page) || 1;
+    const pageSize = req.body.pageSize || 5; //  אמור להיות קבוע וכרגע נשלח מהקליינט
+    const skipCount = (page - 1) * pageSize;
+    const data = await eventService.findEventSearch(
+      location,
+      btnDates,
+      categories,
+      audiences,
+      page,
+      pageSize,
+      skipCount,
     );
     res.status(200).send(data);
   } catch (err) {

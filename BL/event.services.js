@@ -151,9 +151,11 @@ function getDatesWithNumberOfOccurrences(
 //   return results;
 // }
 
-async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
+  
+
+async function findEvent(page, pageSize, currentDate, search, skipCount) {
  const filteredEvents = await eventModel.aggregate([
-      { $match: { date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] } },
+      { $match: { $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate} }},
       { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", currentDate] } } } } },
       { $sort: { date: 1 } },
       { $skip: skipCount },
@@ -163,7 +165,77 @@ async function findEvent(page, pageSize, currentDate, search, skipCount = 0) {
   const results = {}
   const endIndex = page * pageSize
 
-  if (endIndex < await eventModel.find({ date: { $gte: currentDate }, $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }] }).countDocuments().exec()) {
+  if (endIndex < await eventModel.find({ $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate} 
+}).countDocuments().exec()) {
+    results.nextPage = page + 1
+  }
+
+  results.event = filteredEvents
+  return results;
+}
+
+async function findEventSearch (location,btnDates,categories,audiences,page,pageSize,skipCount,timezoneOffset=-180) {
+
+// startDate endDate הגדרת 
+  const timezone = timezoneOffset
+  const now = new Date();
+  let dayPas = new Date(now.getTime() + timezone * 60 * 1000);
+  dayPas.setHours(24, 0, 0, 0);
+  let startDate;
+  let endDate;
+  if(btnDates==="allDate"){
+    startDate=now ;
+    endDate = new Date(now.getFullYear() + 100, now.getMonth(), now.getDate())}// תאריך סיום בעוד 100 שנה
+  else if(btnDates==="today"){
+    startDate=now
+    endDate = dayPas
+  }
+  else if (btnDates === "tomorrow") {
+    startDate = dayPas
+    endDate = new Date(dayPas.getTime() + 24 * 60 * 60 * 1000);
+  }
+  else if (btnDates === "thisWeek") {
+    startDate=now
+    const dayOfWeek = now.getDay();
+    const daysUntilEndOfWeek = (6 - dayOfWeek + timezone / 60 / 24 + 7) % 7;
+    endDate = new Date(now.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
+  } else {
+    throw "Selected value is not defined";
+  }
+    
+  const matchQuery = {
+    place: { $regex: location, $options: "i" },
+    date: { $elemMatch: { $gte: startDate, $lt: endDate } }
+  };
+  
+  if (categories.length > 0) {
+    matchQuery.categories = { $in: categories };
+  }
+  if (audiences.length > 0) {
+    matchQuery.audiences = { $in: audiences };
+  }
+  const filteredEvents = await eventModel.aggregate([
+    { $match: matchQuery },
+    {
+      $addFields: {
+        date: {
+          $filter: {
+            input: "$date",
+            as: "date",
+            cond: { $gte: ["$$date", startDate] }
+          }
+        }
+      }
+    },
+    { $sort: { date: 1 } },
+    { $skip: skipCount },
+    { $limit: pageSize }
+  ]);
+
+  const results = {}
+  const endIndex = page * pageSize
+
+  if (endIndex < await eventModel.find(matchQuery).countDocuments().exec()) {
     results.nextPage = page + 1
   }
 
@@ -247,5 +319,6 @@ module.exports = {
   findEventByID,
   findEventById,
   sendEventDetailsToAdvertiser,
-  updateStatusEvent
+  updateStatusEvent,
+  findEventSearch
 };
