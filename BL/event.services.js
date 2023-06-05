@@ -175,7 +175,8 @@ async function findEvent(page, pageSize, currentDate, search, skipCount) {
 }
 
 async function findEventSearch (location,btnDates,categories,audiences,page,pageSize,skipCount,timezoneOffset=-180) {
-  console.log(btnDates);
+
+// startDate endDate הגדרת 
   const timezone = timezoneOffset
   const now = new Date();
   let dayPas = new Date(now.getTime() + timezone * 60 * 1000);
@@ -202,20 +203,39 @@ async function findEventSearch (location,btnDates,categories,audiences,page,page
     throw "Selected value is not defined";
   }
     
-  // שעת התחלה ושעת סיום
- const filteredEvents = await eventModel.aggregate([
-      { $match: { place: { $regex: location , $options: "i" }, date: { $elemMatch: { $gte: startDate , $lt: endDate} }}},
-      { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", startDate] } } } } },
-      { $sort: { date: 1 } },
-      { $skip: skipCount },
-      { $limit: pageSize }
-    ]);
+  const matchQuery = {
+    place: { $regex: location, $options: "i" },
+    date: { $elemMatch: { $gte: startDate, $lt: endDate } }
+  };
+  
+  if (categories.length > 0) {
+    matchQuery.categories = { $in: categories };
+  }
+  if (audiences.length > 0) {
+    matchQuery.audiences = { $in: audiences };
+  }
+  const filteredEvents = await eventModel.aggregate([
+    { $match: matchQuery },
+    {
+      $addFields: {
+        date: {
+          $filter: {
+            input: "$date",
+            as: "date",
+            cond: { $gte: ["$$date", startDate] }
+          }
+        }
+      }
+    },
+    { $sort: { date: 1 } },
+    { $skip: skipCount },
+    { $limit: pageSize }
+  ]);
 
   const results = {}
   const endIndex = page * pageSize
 
-  if (endIndex < await eventModel.find({ place: { $regex: location , $options: "i" }, date: { $elemMatch: { $gte: startDate , $lt: endDate} }  
-}).countDocuments().exec()) {
+  if (endIndex < await eventModel.find(matchQuery).countDocuments().exec()) {
     results.nextPage = page + 1
   }
 
