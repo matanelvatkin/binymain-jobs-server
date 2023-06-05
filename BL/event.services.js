@@ -178,18 +178,28 @@ async function findEventSearch (location,btnDates,categories,audiences,page,page
   console.log(btnDates);
   const timezone = timezoneOffset
   const now = new Date();
+  let dayPas = new Date(now.getTime() + timezone * 60 * 1000);
+  dayPas.setHours(24, 0, 0, 0);
   let startDate;
   let endDate;
-  if(btnDates==="allDate"){startDate=now ; endDate = new Date(now.getFullYear() + 100, now.getMonth(), now.getDate())}// תאריך סיום בעוד 100 שנה
+  if(btnDates==="allDate"){
+    startDate=now ;
+    endDate = new Date(now.getFullYear() + 100, now.getMonth(), now.getDate())}// תאריך סיום בעוד 100 שנה
   else if(btnDates==="today"){
-    startDate = new Date(now.getTime() + timezone * 60 * 1000);
-    startDate.setHours(0, 0, 0, 0);
-    endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    startDate=now
+    endDate = dayPas
   }
   else if (btnDates === "tomorrow") {
-    startDate = new Date(now.getTime() + timezone * 60 * 1000);
-    startDate.setHours(24, 0, 0, 0);
-    endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+    startDate = dayPas
+    endDate = new Date(dayPas.getTime() + 24 * 60 * 60 * 1000);
+  }
+  else if (btnDates === "thisWeek") {
+    startDate=now
+    const dayOfWeek = now.getDay();
+    const daysUntilEndOfWeek = (6 - dayOfWeek + timezone / 60 / 24 + 7) % 7;
+    endDate = new Date(now.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
+  } else {
+    throw "Selected value is not defined";
   }
     
   // שעת התחלה ושעת סיום
