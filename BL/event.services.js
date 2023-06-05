@@ -155,7 +155,7 @@ function getDatesWithNumberOfOccurrences(
 
 async function findEvent(page, pageSize, currentDate, search, skipCount) {
  const filteredEvents = await eventModel.aggregate([
-      { $match: { $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate , $lte : endDate } }},
+      { $match: { $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate} }},
       { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", currentDate] } } } } },
       { $sort: { date: 1 } },
       { $skip: skipCount },
@@ -165,7 +165,46 @@ async function findEvent(page, pageSize, currentDate, search, skipCount) {
   const results = {}
   const endIndex = page * pageSize
 
-  if (endIndex < await eventModel.find({ $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate , $lt : endDate } 
+  if (endIndex < await eventModel.find({ $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }], date: { $gte: currentDate} 
+}).countDocuments().exec()) {
+    results.nextPage = page + 1
+  }
+
+  results.event = filteredEvents
+  return results;
+}
+
+async function findEventSearch (location,btnDates,categories,audiences,page,pageSize,skipCount,timezoneOffset=-180) {
+  console.log(btnDates);
+  const timezone = timezoneOffset
+  const now = new Date();
+  let startDate;
+  let endDate;
+  if(btnDates==="allDate"){startDate=now ; endDate = new Date(now.getFullYear() + 100, now.getMonth(), now.getDate())}// תאריך סיום בעוד 100 שנה
+  else if(btnDates==="today"){
+    startDate = new Date(now.getTime() + timezone * 60 * 1000);
+    startDate.setHours(0, 0, 0, 0);
+    endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+  }
+  else if (btnDates === "tomorrow") {
+    startDate = new Date(now.getTime() + timezone * 60 * 1000);
+    startDate.setHours(24, 0, 0, 0);
+    endDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+  }
+    
+  // שעת התחלה ושעת סיום
+ const filteredEvents = await eventModel.aggregate([
+      { $match: { place: { $regex: location , $options: "i" }, date: { $elemMatch: { $gte: startDate , $lt: endDate} }}},
+      { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", startDate] } } } } },
+      { $sort: { date: 1 } },
+      { $skip: skipCount },
+      { $limit: pageSize }
+    ]);
+
+  const results = {}
+  const endIndex = page * pageSize
+
+  if (endIndex < await eventModel.find({ place: { $regex: location , $options: "i" }, date: { $elemMatch: { $gte: startDate , $lt: endDate} }  
 }).countDocuments().exec()) {
     results.nextPage = page + 1
   }
@@ -250,5 +289,6 @@ module.exports = {
   findEventByID,
   findEventById,
   sendEventDetailsToAdvertiser,
-  updateStatusEvent
+  updateStatusEvent,
+  findEventSearch
 };
