@@ -4,7 +4,8 @@ const eventService = require("../BL/event.services");
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
-const ADMIN_MAIL = process.env.ADMIN_MAIL;
+const ADMIN_MAIL = "kobikru@gmail.com";
+// process.env.ADMIN_MAIL;
 const uuidv4 = require("uuid/v4");
 const { sendError } = require("../errController");
 const { log } = require("console");
@@ -132,36 +133,51 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
 
     if (cardImageURL) {
       const result = await cloudinary.uploader.upload(cardImageURL[0].path, {
-        folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/cardImageURL",
+        folder:
+          dataEvent.advertiser.email +
+          "/" +
+          dataEvent.eventName +
+          "/cardImageURL",
         transformation: [
-          {aspect_ratio: "1.0", crop: "fill"},
-          {quality: "auto"},
-          {fetch_format: "auto"}
-          ],
+          { aspect_ratio: "1.0", crop: "fill" },
+          { quality: "auto" },
+          { fetch_format: "auto" },
+        ],
       });
-      dataEvent.cardImageURL = result.secure_url
-    }``
+      dataEvent.cardImageURL = result.secure_url;
+    }
+    ``;
     if (coverImageURL) {
       const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
-        folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/coverImageURL",
+        folder:
+          dataEvent.advertiser.email +
+          "/" +
+          dataEvent.eventName +
+          "/coverImageURL",
         transformation: [
-          {aspect_ratio: "1.77778", crop: "fill"},
-          {quality: "auto"},
-          {fetch_format: "auto"}
-          ],
+          { aspect_ratio: "1.77778", crop: "fill" },
+          { quality: "auto" },
+          { fetch_format: "auto" },
+        ],
       });
-      dataEvent.coverImageURL = result.secure_url
+      dataEvent.coverImageURL = result.secure_url;
     }
     if (gallery) {
-      dataEvent.gallery = gallery.map(async file=>
-        await cloudinary.uploader.upload(file.path, {
-          folder: dataEvent.advertiser.email+"/"+dataEvent.eventName+"/gallery",
-        })
+      dataEvent.gallery = gallery.map(
+        async (file) =>
+          await cloudinary.uploader.upload(file.path, {
+            folder:
+              dataEvent.advertiser.email +
+              "/" +
+              dataEvent.eventName +
+              "/gallery",
+          })
       );
     }
     console.log({ dataEvent });
     const event = await eventService.createNewEvent(dataEvent);
     res.send(event);
+    console.log(event);
     //TODO: send to email function
     // eventService.sendEventDetailsToAdvertiser(event.advertiser.email,event._id);
 

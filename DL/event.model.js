@@ -47,6 +47,10 @@ const eventSchema = new mongoose.Schema({
     type: String,
     // require: true,
   },
+  accuratelocation: {
+    type: String,
+    // require: true,
+  },
   categories: [
     {
       type: String,
