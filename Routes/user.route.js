@@ -69,9 +69,7 @@ userRouter.post("/verify", async (req, res) => {
 
 userRouter.post("/checkUserType", async (req, res) => {
   try {
-    console.log(req.body);
     const token = req.body.aoutherizetion;
-    console.log(token);
     const verifyUser = await userServices.checkUserType(token);
     if (verifyUser) {
       res.status(200).send(verifyUser)
