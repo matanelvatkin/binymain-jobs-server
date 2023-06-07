@@ -17,10 +17,12 @@ async function createUser(newUserData) {
 async function findUser(user) {
   const foundUser = await userController.find(user);
   if (foundUser) {
+    console.log(foundUser.userType);
     try {
-      const token = jwt.sign({ email: user.email },
-         process.env.JWT_SECRET, 
-         { expiresIn: '1440h' });
+      const token = jwt.sign(
+        { email: user.email, userType: foundUser.userType },
+        process.env.JWT_SECRET,
+        { expiresIn: '1440h' });
       return { user: foundUser, token };
     } catch (err) {
       console.error('Error generating Token:', err);
@@ -30,7 +32,7 @@ async function findUser(user) {
     return { error: 'Invalid credentials' };
   }
 }
- 
+
 
 async function forgetPassword(email, code) {
   const subject = 'Forget Password'
@@ -69,16 +71,37 @@ async function changePassword(email, newPassword) {
 async function verifyToken(token) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if(decoded) {
-    const email = decoded.email;
-    const verifyedUser = await userController.findEmail(email);
-    return verifyedUser;
+    if (decoded) {
+      const email = decoded.email;
+      const verifyedUser = await userController.findEmail(email);
+      return verifyedUser;
     }
   } catch (err) {
-    if(err.name === 'TokenExpiredError'){
-    console.error('token not valid', err.name);
-    return { error: 'token is expired' }
-    }else{
+    if (err.name === 'TokenExpiredError') {
+      console.error('token not valid', err.name);
+      return { error: 'token is expired' }
+    } else {
+      return err;
+    }
+  }
+}
+
+
+async function checkUserType(token) {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded) {
+      const email = decoded.email;
+      const verifyedUser = await userController.findEmail(email);
+      if (verifyedUser.userType === 'admin') {
+        return verifyedUser
+      };
+    }
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      console.error('token not valid', err.name);
+      return { error: 'token is expired' }
+    } else {
       return err;
     }
   }
@@ -122,6 +145,7 @@ module.exports = {
   forgetPassword,
   changePassword,
   verifyToken,
+  checkUserType,
   // addFavourite,
   // removeFavourite
 }

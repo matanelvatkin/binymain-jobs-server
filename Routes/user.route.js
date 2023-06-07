@@ -52,8 +52,27 @@ userRouter.post('/resetPassword', async (req, res) => {
 
 userRouter.post("/verify", async (req, res) => {
   try {
+    console.log(req.body);
     const token = req.body.aoutherizetion;
+    console.log(token);
     const verifyUser = await userServices.verifyToken(token);
+    if (verifyUser) {
+      res.status(200).send(verifyUser)
+    } else {
+      return res.status(401).send({ error: 'Token not valid' });
+    }
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+
+userRouter.post("/checkUserType", async (req, res) => {
+  try {
+    console.log(req.body);
+    const token = req.body.aoutherizetion;
+    console.log(token);
+    const verifyUser = await userServices.checkUserType(token);
     if (verifyUser) {
       res.status(200).send(verifyUser)
     } else {
