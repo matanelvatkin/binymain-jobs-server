@@ -65,6 +65,21 @@ userRouter.post("/verify", async (req, res) => {
 });
 
 
+userRouter.post("/checkUserType", async (req, res) => {
+  try {
+    const token = req.body.aoutherizetion;
+    const verifyUser = await userServices.checkUserType(token);
+    if (verifyUser) {
+      res.status(200).send(verifyUser)
+    } else {
+      return res.status(401).send({ error: 'Token not valid' });
+    }
+  } catch (err) {
+    sendError(res, err);
+  }
+});
+
+
 // userRouter.put("/addFavou", async(req,res)=>{
 //   try{
 //     console.log(req.body);
