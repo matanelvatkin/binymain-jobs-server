@@ -11,6 +11,7 @@ const { log } = require("console");
 const { sendMail } = require("../BL/emailInterface");
 const URL = "localhost:5000";
 const DIR = "upload";
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -60,16 +61,7 @@ eventRouter.post("", async (req, res) => {
   try {
     const search = req.body.search || "";
     const page = parseInt(req.body.page) || 1;
-    const pageSize = req.body.pageSize || 5; //  אמור להיות קבוע וכרגע נשלח מהקליינט
-    const currentDate = req.body.currentDate || new Date();
-    const skipCount = (page - 1) * pageSize;
-    const data = await eventService.findEvent(
-      page,
-      pageSize,
-      currentDate,
-      search,
-      skipCount,
-    );
+    const data = await eventService.findEvent(page , search);
     res.status(200).send(data);
   } catch (err) {
     sendError(res, err);
@@ -83,16 +75,12 @@ eventRouter.post("/search", async (req, res) => {
     const categories = req.body.categories || [];
     const audiences = req.body.audiences || [];
     const page = parseInt(req.body.page) || 1;
-    const pageSize = req.body.pageSize || 5; //  אמור להיות קבוע וכרגע נשלח מהקליינט
-    const skipCount = (page - 1) * pageSize;
     const data = await eventService.findEventSearch(
       location,
       btnDates,
       categories,
       audiences,
       page,
-      pageSize,
-      skipCount,
     );
     res.status(200).send(data);
   } catch (err) {
