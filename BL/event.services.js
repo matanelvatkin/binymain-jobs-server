@@ -137,9 +137,8 @@ function getDatesWithNumberOfOccurrences(
   return dates;
 }
 
-const now = new Date();
 
-async function pagination (filterModel, page , startDate){
+async function pagination (filterModel, page , startDate ,endDate){
   const pageSize = 10
   const skipCount = (page - 1) * pageSize;
   const results = {}
@@ -152,6 +151,7 @@ async function pagination (filterModel, page , startDate){
     { $limit: pageSize }
   ]
   results.startDate= startDate
+  results.endDate= endDate
   results.event = await eventModel.aggregate(Query)
 
   if (endIndex <  await eventModel.find(filterModel).countDocuments().exec()) {
@@ -163,16 +163,23 @@ async function pagination (filterModel, page , startDate){
 
   
 
-async function findEvent(page, search) {
+async function findEvent(page, search, user) {
+  const now = new Date();
   const filterModel = {
     $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }],
     date: { $gte: now}
   }
+  
+  if (!user||user.userType!=="admin") {
+    filterModel.status = { $regex: "published" };
+  }
+
+
   return pagination(filterModel,page,now)
 }
 
-async function findEventSearch (location,btnDates,categories,audiences,page) {
-
+async function findEventSearch (location,btnDates,categories,audiences,page, user) {
+  const now = new Date();
 // startDate endDate הגדרת 
   const fixTimezoneHour = -3
   const fixTimezoneMinute = 60*fixTimezoneHour
@@ -193,9 +200,10 @@ async function findEventSearch (location,btnDates,categories,audiences,page) {
   }
   else if (btnDates === "thisWeek") {
     startDate=now
-    const dayOfWeek = now.getDay();
-    const daysUntilEndOfWeek = (6 - dayOfWeek + fixTimezoneMinute / 60 / 24 + 7) % 7;
-    endDate = new Date(now.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
+    const fixDateOfDay =  new Date(now.getTime() + fixTimezoneMinute * 60 * 1000)
+    const dayOfWeek = fixDateOfDay.getDay();
+    const daysUntilEndOfWeek = (13 - dayOfWeek ) % 7;
+    endDate = new Date(dayPas.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
   } else {
     throw "Selected value is not defined";
   }
@@ -206,6 +214,10 @@ async function findEventSearch (location,btnDates,categories,audiences,page) {
     date: { $elemMatch: { $gte: startDate, $lt: endDate } }
   };
   
+
+  if (!user||user.userType!=="admin") {
+    matchQuery.status = { $regex: "published" };
+  }
   if (categories.length > 0) {
     matchQuery.categories = { $in: categories };
   }
@@ -213,7 +225,7 @@ async function findEventSearch (location,btnDates,categories,audiences,page) {
     matchQuery.audiences = { $in: audiences };
   }
 
-  return pagination (matchQuery,page,startDate)
+  return pagination (matchQuery,page,startDate,endDate)
 }
 
 async function findEventById(id) {

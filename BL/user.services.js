@@ -68,6 +68,14 @@ async function changePassword(email, newPassword) {
   }
 }
 
+async function checkToken(req,res,next){
+  let token = req.headers.authorization.replace('Bearer ', '')
+  let result = await verifyToken(token)
+  req.user = result
+  next()
+}
+
+
 async function verifyToken(token) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -146,6 +154,7 @@ module.exports = {
   changePassword,
   verifyToken,
   checkUserType,
+  checkToken
   // addFavourite,
   // removeFavourite
 }

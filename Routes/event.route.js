@@ -1,6 +1,7 @@
 const express = require("express");
 const eventRouter = express.Router();
 const eventService = require("../BL/event.services");
+const userService  = require("../BL/user.services" );
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
@@ -11,6 +12,7 @@ const { log } = require("console");
 const { sendMail } = require("../BL/emailInterface");
 const URL = "localhost:5000";
 const DIR = "upload";
+const userToken = userService.checkToken
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -57,30 +59,33 @@ const multiUpload = upload.fields([
   { name: "gallery", maxCount: 5 },
 ]);
 
-eventRouter.post("", async (req, res) => {
+eventRouter.post("" ,userToken ,async (req, res) => {
   try {
     const search = req.body.search || "";
     const page = parseInt(req.body.page) || 1;
-    const data = await eventService.findEvent(page , search);
+    const user = req.user
+    const data = await eventService.findEvent(page , search, user);
     res.status(200).send(data);
   } catch (err) {
     sendError(res, err);
   }
 });
 
-eventRouter.post("/search", async (req, res) => {
+eventRouter.post("/search",userToken , async (req, res) => {
   try {
     const location = req.body.location || "";
     const btnDates = req.body.btnDates || "";
     const categories = req.body.categories || [];
     const audiences = req.body.audiences || [];
     const page = parseInt(req.body.page) || 1;
+    const user = req.user
     const data = await eventService.findEventSearch(
       location,
       btnDates,
       categories,
       audiences,
       page,
+      user
     );
     res.status(200).send(data);
   } catch (err) {
