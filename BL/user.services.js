@@ -69,9 +69,14 @@ async function changePassword(email, newPassword) {
 }
 
 async function checkToken(req,res,next){
-  let token = req.headers.authorization.replace('Bearer ', '')
-  let result = await verifyToken(token)
-  req.user = result
+  try {
+    
+    let token = req.headers.authorization.replace('Bearer ', '')
+    let result = await verifyToken(token)
+    req.user = result
+  } catch (error) {
+   console.log("waring, line 78 in user.service.js: don't send authorization in header");
+  }
   next()
 }
 
