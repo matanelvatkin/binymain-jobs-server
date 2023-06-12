@@ -68,6 +68,19 @@ async function changePassword(email, newPassword) {
   }
 }
 
+async function checkToken(req,res,next){
+  try {
+    
+    let token = req.headers.authorization.replace('Bearer ', '')
+    let result = await verifyToken(token)
+    req.user = result
+  } catch (error) {
+   console.log("waring, line 78 in user.service.js: don't send authorization in header");
+  }
+  next()
+}
+
+
 async function verifyToken(token) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -146,6 +159,7 @@ module.exports = {
   changePassword,
   verifyToken,
   checkUserType,
+  checkToken
   // addFavourite,
   // removeFavourite
 }
