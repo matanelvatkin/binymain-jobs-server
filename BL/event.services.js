@@ -205,7 +205,7 @@ async function findEventSearch (location,btnDates,categories,audiences,page, use
     const daysUntilEndOfWeek = (13 - dayOfWeek ) % 7;
     endDate = new Date(dayPas.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
   } else {
-    throw "Selected value is not defined";
+    throw "Selected value btnDates is not defined (line 208 in event/services.js)";
   }
     //סוף 
   
