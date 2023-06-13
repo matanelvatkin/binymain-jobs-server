@@ -96,7 +96,7 @@ eventRouter.post("/search",userToken , async (req, res) => {
 eventRouter.get("/:eventID", async (req, res) => {
   try {
     const currentDate = req.body.currentDate || new Date();
-    const event = await eventService.findEventByID(
+    const event = await eventService.findEventById(
       req.params.eventID,
       currentDate
     );
