@@ -17,19 +17,23 @@ async function createUser(newUserData) {
 async function findUser(user) {
   const foundUser = await userController.find(user);
   if (foundUser) {
-    console.log(foundUser.userType);
     try {
-      const token = jwt.sign(
-        { email: user.email, userType: foundUser.userType },
-        process.env.JWT_SECRET,
-        { expiresIn: '1440h' });
-      return { user: foundUser, token };
+      const isPasswordMatch = await bcrypt.compare(user.password, foundUser.password);
+      if (isPasswordMatch) {
+        const token = jwt.sign(
+          { email: user.email, userType: foundUser.userType },
+          process.env.JWT_SECRET,
+          { expiresIn: '1440h' });
+        return { user: foundUser, token };
+      } else {
+        return ('סיסמא שגויה');
+      }
     } catch (err) {
       console.error('Error generating Token:', err);
       return { error: 'Error generating JWT token' };
     }
   } else {
-    return { error: 'Invalid credentials' };
+    return ('לא הצליח למצוא משתמש');
   }
 }
 

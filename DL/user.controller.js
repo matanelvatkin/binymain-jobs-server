@@ -19,21 +19,12 @@ async function create(data) {
 
 
 async function find(user) {
-  const { email, password } = user;
+  const { email } = user;
   try {
     const foundUser = await userData.findOne({ email });
-    if (foundUser) {
-      const isPasswordMatch = await bcrypt.compare(password, foundUser.password);
-      if (isPasswordMatch) {
-        return foundUser;
-      } else {
-        throw new Error('Invalid credentials');
-      }
-    } else {
-      throw new Error('User not found');
-    }
+    return foundUser;
   } catch (error) {
-    throw new Error('Error finding User');
+    return { error: 'לא הצליח למצוא משתמש' };
   }
 }
 
