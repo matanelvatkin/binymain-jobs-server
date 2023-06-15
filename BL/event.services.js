@@ -2,6 +2,7 @@ const eventController = require("../DL/event.controller");
 const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
 const settingService = require("../BL/setting.services");
+const errController = require('../errController');
 
 async function createNewEvent(eventData) {
   var dates = [];
@@ -205,14 +206,21 @@ async function findEventSearch (location,btnDates,categories,audiences,page, use
     const daysUntilEndOfWeek = (13 - dayOfWeek ) % 7;
     endDate = new Date(dayPas.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
   } else {
-    throw "Selected value btnDates is not defined (line 208 in event/services.js)";
+    throw errController.errMessage.SETTING_NOT_FOUND
   }
     //סוף 
   
   const matchQuery = {
-    place: { $regex: location, $options: "i" },
     date: { $elemMatch: { $gte: startDate, $lt: endDate } }
   };
+
+  if (typeof location === 'string') {
+    matchQuery.place = { $regex: location };
+  } else if(Array.isArray(location)){
+    matchQuery.place = { $in: location };
+  } else{
+    throw errController.errMessage.SETTING_NOT_FOUND
+  }
   
 
   if (!user||user.userType!=="admin") {
