@@ -6,10 +6,10 @@ const bcrypt = require('bcrypt')
 async function create(data) {
   try {
     const findEmail = await userData.findOne({email:data.email});
-    if (findEmail) {
-      throw new Error('Email alredy in use');
-    } else {
+    if (!findEmail) {
       return await userData.create(data);
+    } else {
+      return { error: `האימייל ${findEmail.email} נמצא כבר בשימוש`, Email: findEmail.email };
     }
   } catch (error) {
     throw error;
