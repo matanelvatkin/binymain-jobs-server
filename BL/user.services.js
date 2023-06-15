@@ -7,10 +7,14 @@ const jwt = require('jsonwebtoken');
 
 async function createUser(newUserData) {
   const newUser = await userController.create(newUserData);
-  return {
-    status: "success",
-    newUser: newUser,
-  };
+  if (newUser) {
+    return {
+      newUser: newUser
+    };
+  } else {
+    return {email: newUserData.email}
+  }
+  
 }
 
 
