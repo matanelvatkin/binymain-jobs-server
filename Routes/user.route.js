@@ -1,7 +1,7 @@
 const express = require("express");
 const userRouter = express.Router();
 const userServices = require("../BL/user.services");
-const { sendError, errorMsg } = require("../errController");
+const { sendError, errMessage } = require("../errController");
 
 
 userRouter.post("/creatUser", async (req, res) => {
@@ -9,7 +9,7 @@ userRouter.post("/creatUser", async (req, res) => {
     const user = await userServices.createUser(req.body);
     res.status(200).send(user);
   } catch (err) {
-    sendError(res, err);
+   return sendError(res, err);
   }
 });
 
