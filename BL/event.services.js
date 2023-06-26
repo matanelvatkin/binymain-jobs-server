@@ -3,6 +3,152 @@ const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
 const settingService = require("../BL/setting.services");
 const errController = require('../errController');
+const { count } = require("../DL/setting.model");
+
+
+async function newCreateNewEvent(eventData){
+
+if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventData.personalRepeatType=="days"){
+  dailyRepetition(eventData.date, eventData.repeatTimes, eventData.repeatType, eventData.repeatSettingsPersonal.type,
+    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd)
+}
+if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeatType=="weeks")){
+  weeklyRepetitionDateEnd(eventData.date,eventData.repeatType,  eventData.repeatTimes, eventData.repeatSettingsPersonal.type,
+    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd, eventData.day)
+}
+  else {
+      console.log("disposable")
+        dates.push(new Date(currentDate));
+        eventData.date = dates;
+      }
+  // }
+  // 
+  // const newEvent = await eventController.create(eventData);
+  console.log(eventData.dates)
+  return newEvent;
+}
+
+
+ function dailyRepetition (startDate, repeatTimes, repeatType, endType, repeatDateEnd, RepeatTimesEnd){
+  startDate = new Date(startDate);
+  let endDate=new Date();
+  const dates=[];
+  if(repeatType=="daily"){
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
+  }
+if (repeatType=="customized"){
+  if(endType=="endDate"){
+    endDate= repeatDateEnd; 
+    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
+  }
+  else{
+    endDate= startDate.setDate(startDate.getDate() + ((RepeatTimesEnd-1)*repeatTimes));
+    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
+  }
+}
+  while (startDate <= endDate) {
+    dates.push(new Date(startDate));
+    startDate.setDate(currentDate.getDate() + repeatTimes);
+  }
+  eventData.date = dates;
+ }
+
+
+function weeklyRepetitionDateEnd(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
+  startDate = new Date(startDate);
+  let endDate=new Date();
+  const dates=[];
+  let repeat= 1;
+
+switch(repeatTimes){
+case 2:
+repeat=8;
+case 3:
+repeat=15;
+case 4:
+  repeat= 22;
+  }
+
+if(repeatType=="weekly" ||(repeatType=="customized" && endType=="endDate")){
+
+if (repeatType=="weekly"){
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
+days.push(startDate.getDay())
+}
+
+if(repeatType=="customized" && endType=="endDate"){
+  endDate= endDate= repeatDateEnd; 
+  endDate<=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
+}
+
+while (startDate <= endDate) {
+
+if(days.includes(startDate.getDay())){
+  dates.push(startDate)
+}
+startDate.getDay()==6? startDate.setDate(startDate.getDate() + repeat):
+startDate.setDate(startDate.getDate()) +1
+}
+}
+if(repeatType=="customized" && endType=="endNumTimes"){
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
+const counter= 0;
+while (startDate <= endDate && counter< repeatTimesEnd) {
+
+  if(days.includes(startDate.getDay())){
+    dates.push(startDate)
+    counter++
+  }
+  startDate.getDay()==6? startDate.setDate(startDate.getDate() + repeat):
+  startDate.setDate(startDate.getDate()) +1
+  }
+}
+eventData.date = dates;
+}
+
+
+
+//   else if(eventData.repeatType=="weekly"){
+  // while (currentDate <= endDate) {
+  //   dates.push(new Date(currentDate));
+  //    currentDate.setDate(currentDate.getDate() + 7);
+  //  }
+  // const dates=[];
+  // const currentDate = new Date(eventData.date);
+  // const endDate=new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate()-1);
+  // if(!eventData.personalRepeatType){
+  //   if(eventData.repeatType=="daily"){
+  //     while (currentDate <= endDate) {
+  //       dates.push(new Date(currentDate));
+  //       currentDate.setDate(currentDate.getDate() + 1);
+  //     }
+  //     }
+  //   else if(eventData.repeatType=="weekly"){
+  //       while (currentDate <= endDate) {
+  //         dates.push(new Date(currentDate));
+  //          currentDate.setDate(currentDate.getDate() + 7);
+  //        }
+  //     }  
+
+
+
+
+
+
+// else if(eventData.repeatType=="weekly"){
+//   //     for (i=currentDate; i<= endDate; i.setDate(i.getDate()+1)) {
+//   //       if(i.getDay()===dayOfWeek){
+//   //         dates.push(new Date(i));
+
+
+
+
+
+
+
 
 async function createNewEvent(eventData) {
   var dates = [];
@@ -307,6 +453,7 @@ async function sendEventDetailsToAdvertiser(email, _id) {
 
 
 module.exports = {
+  newCreateNewEvent,
   createNewEvent,
   findEvent,
   findEventByID,

@@ -167,7 +167,8 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
       );
     }
     console.log({ dataEvent });
-    const event = await eventService.createNewEvent(dataEvent);
+    // const event = await eventService.createNewEvent(dataEvent);
+    const event = await eventService.newCreateNewEvent(dataEvent);
     res.send(event);
     console.log(event);
     //TODO: send to email function
