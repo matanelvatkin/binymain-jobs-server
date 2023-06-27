@@ -7,38 +7,45 @@ const { count } = require("../DL/setting.model");
 
 
 async function newCreateNewEvent(eventData){
+  const dates=[];
+  let startDate = new Date(eventData.date);
 
-if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventData.personalRepeatType=="days"){
-  dailyRepetition(eventData.date, eventData.repeatTimes, eventData.repeatType, eventData.repeatSettingsPersonal.type,
-    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd)
-}
-if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeatType=="weeks")){
-  weeklyRepetitionDateEnd(eventData.date,eventData.repeatType,  eventData.repeatTimes, eventData.repeatSettingsPersonal.type,
+if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventData.personalRepeat=="days"){
+  console.log(startDate)
+ const dayList=
+  dailyRepetition(startDate, eventData.repeatTimes, eventData.repeatType, eventData.repeatSettingsPersonal.type,
+    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd);
+    eventData.date=dayList;
+  }
+else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeat=="weeks")){
+  const weekDaysList=
+  weeklyRepetition(startDate, eventData.repeatType,  eventData.repeatTimes, eventData.repeatSettingsPersonal.type,
     eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd, eventData.day)
+    eventData.date= weekDaysList;
 }
   else {
       console.log("disposable")
-        dates.push(new Date(currentDate));
+        dates.push(new Date(startDate));
         eventData.date = dates;
       }
-  // }
-  // 
-  // const newEvent = await eventController.create(eventData);
-  console.log(eventData.dates)
+  const newEvent = await eventController.create(eventData);
+  console.log(eventData.date)
   return newEvent;
 }
 
 
  function dailyRepetition (startDate, repeatTimes, repeatType, endType, repeatDateEnd, RepeatTimesEnd){
-  startDate = new Date(startDate);
-  let endDate=new Date();
+  // startDate = new Date(startDate);
   const dates=[];
+  let endDate=new Date();
+
   if(repeatType=="daily"){
-  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+  console.log("checkkkkkkkk", endDate)
   }
 if (repeatType=="customized"){
   if(endType=="endDate"){
-    endDate= repeatDateEnd; 
+    endDate= new Date(repeatDateEnd); 
     endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
     endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
   }
@@ -49,17 +56,20 @@ if (repeatType=="customized"){
   }
 }
   while (startDate <= endDate) {
-    dates.push(new Date(startDate));
-    startDate.setDate(currentDate.getDate() + repeatTimes);
+    let currentDate= new Date(startDate);
+  dates.push(currentDate)
+    // dates.push(new Date(startDate));
+    startDate.setDate(startDate.getDate() + repeatTimes);
   }
-  eventData.date = dates;
+
+ return dates;
  }
 
 
-function weeklyRepetitionDateEnd(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
-  startDate = new Date(startDate);
-  let endDate=new Date();
+function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
+
   const dates=[];
+  let endDate=new Date();
   let repeat= 1;
 
 switch(repeatTimes){
@@ -75,11 +85,13 @@ if(repeatType=="weekly" ||(repeatType=="customized" && endType=="endDate")){
 
 if (repeatType=="weekly"){
   endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
-days.push(startDate.getDay())
+  const today= startDate.getDay()
+// days.push(startDate.getDay())
+days.push(today);
 }
 
 if(repeatType=="customized" && endType=="endDate"){
-  endDate= endDate= repeatDateEnd; 
+  endDate= repeatDateEnd; 
   endDate<=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
     endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
 }
@@ -87,26 +99,29 @@ if(repeatType=="customized" && endType=="endDate"){
 while (startDate <= endDate) {
 
 if(days.includes(startDate.getDay())){
-  dates.push(startDate)
+  let currentDate= new Date(startDate);
+  dates.push(currentDate)
 }
-startDate.getDay()==6? startDate.setDate(startDate.getDate() + repeat):
-startDate.setDate(startDate.getDate()) +1
+startDate.getDay()==6?startDate= new Date(startDate.setDate(startDate.getDate() + repeat)):
+startDate=new Date(startDate.setDate(startDate.getDate()+1));
 }
 }
 if(repeatType=="customized" && endType=="endNumTimes"){
   endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
-const counter= 0;
+let counter= 0;
 while (startDate <= endDate && counter< repeatTimesEnd) {
 
   if(days.includes(startDate.getDay())){
-    dates.push(startDate)
+    let currentDate= new Date(startDate);
+    dates.push(currentDate)
+    // dates.push(startDate)
     counter++
   }
-  startDate.getDay()==6? startDate.setDate(startDate.getDate() + repeat):
-  startDate.setDate(startDate.getDate()) +1
+  startDate.getDay()==6?startDate= new Date( startDate.setDate(startDate.getDate() + repeat)):
+  startDate=new Date(startDate.setDate(startDate.getDate()+1));
   }
 }
-eventData.date = dates;
+return dates;
 }
 
 
