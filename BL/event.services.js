@@ -118,45 +118,6 @@ return dates;
 
 
 
-//   else if(eventData.repeatType=="weekly"){
-  // while (currentDate <= endDate) {
-  //   dates.push(new Date(currentDate));
-  //    currentDate.setDate(currentDate.getDate() + 7);
-  //  }
-  // const dates=[];
-  // const currentDate = new Date(eventData.date);
-  // const endDate=new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate()-1);
-  // if(!eventData.personalRepeatType){
-  //   if(eventData.repeatType=="daily"){
-  //     while (currentDate <= endDate) {
-  //       dates.push(new Date(currentDate));
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-  //     }
-  //   else if(eventData.repeatType=="weekly"){
-  //       while (currentDate <= endDate) {
-  //         dates.push(new Date(currentDate));
-  //          currentDate.setDate(currentDate.getDate() + 7);
-  //        }
-  //     }  
-
-
-
-
-
-
-// else if(eventData.repeatType=="weekly"){
-//   //     for (i=currentDate; i<= endDate; i.setDate(i.getDate()+1)) {
-//   //       if(i.getDay()===dayOfWeek){
-//   //         dates.push(new Date(i));
-
-
-
-
-
-
-
-
 async function createNewEvent(eventData) {
   var dates = [];
   let repeat = 1;
