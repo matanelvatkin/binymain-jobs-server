@@ -14,7 +14,7 @@ if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventDat
   console.log(startDate)
  const dayList=
   dailyRepetition(startDate, eventData.repeatTimes, eventData.repeatType, eventData.repeatSettingsPersonal.type,
-    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd);
+    eventData.repeatSettingsPersonal.dateEnd.date, eventData.repeatSettingsPersonal.timesEnd);
     eventData.date=dayList;
   }
 else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeat=="weeks")){
@@ -34,37 +34,35 @@ else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && 
 }
 
 
- function dailyRepetition (startDate, repeatTimes, repeatType, endType, repeatDateEnd, RepeatTimesEnd){
+ function dailyRepetition (startDate, repeatTimes, repeatType, endType, repeatDateEnd, repeatTimesEnd){
   // startDate = new Date(startDate);
   const dates=[];
   let endDate=new Date();
+  const times= Number(repeatTimes);
+
 
   if(repeatType=="daily"){
   endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
-  console.log("checkkkkkkkk", endDate)
   }
 if (repeatType=="customized"){
   if(endType=="endDate"){
     endDate= new Date(repeatDateEnd); 
-    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
-    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
+    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
   }
   else{
-    endDate= startDate.setDate(startDate.getDate() + ((RepeatTimesEnd-1)*repeatTimes));
-    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
-    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
+    endDate= new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()+ ((repeatTimesEnd-1)*times)+1);
+    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
   }
 }
   while (startDate <= endDate) {
     let currentDate= new Date(startDate);
   dates.push(currentDate)
-    // dates.push(new Date(startDate));
-    startDate.setDate(startDate.getDate() + repeatTimes);
+    startDate= new Date( startDate.setDate(startDate.getDate() + times));
   }
-
  return dates;
  }
-
 
 function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
 
@@ -72,32 +70,27 @@ function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDate
   let endDate=new Date();
   let repeat= 1;
 
-switch(repeatTimes){
-case 2:
-repeat=8;
-case 3:
-repeat=15;
-case 4:
-  repeat= 22;
-  }
+ let times= repeatTimes; 
+
+if(times==2){
+  repeat=8;
+}
 
 if(repeatType=="weekly" ||(repeatType=="customized" && endType=="endDate")){
 
 if (repeatType=="weekly"){
   endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
   const today= startDate.getDay()
-// days.push(startDate.getDay())
 days.push(today);
 }
 
 if(repeatType=="customized" && endType=="endDate"){
-  endDate= repeatDateEnd; 
-  endDate<=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)?endDate:
-    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1)
+  endDate= new Date(repeatDateEnd.date); 
+  endDate<=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
 }
 
 while (startDate <= endDate) {
-
 if(days.includes(startDate.getDay())){
   let currentDate= new Date(startDate);
   dates.push(currentDate)
@@ -107,14 +100,13 @@ startDate=new Date(startDate.setDate(startDate.getDate()+1));
 }
 }
 if(repeatType=="customized" && endType=="endNumTimes"){
-  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
 let counter= 0;
 while (startDate <= endDate && counter< repeatTimesEnd) {
 
   if(days.includes(startDate.getDay())){
     let currentDate= new Date(startDate);
     dates.push(currentDate)
-    // dates.push(startDate)
     counter++
   }
   startDate.getDay()==6?startDate= new Date( startDate.setDate(startDate.getDate() + repeat)):
