@@ -30,6 +30,7 @@ else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && 
       }
   const newEvent = await eventController.create(eventData);
   console.log(eventData.date)
+  console.log(newEvent)
   return newEvent;
 }
 
@@ -64,6 +65,19 @@ if (repeatType=="customized"){
  return dates;
  }
 
+    // const days = [{value: "א",nameDay:"ראשון", day:0}, {value: "ב",nameDay:"שני", day: 1}, {value:"ג", nameDay:"שלישי", day:2},
+    // {value: "ד", nameDay:"רביעי",day: 3}, {value: "ה", nameDay:"חמישי", day:4 }, {value:"ו",nameDay:"שישי", day:5 },
+    // {value:"ש", nameDay:"שבת", day: 6}];
+// useEffect(()=>{
+//   console.log("chooseDays", chooseDays)
+//   const filteredArray = chooseDays.filter((obj) => Object.keys(obj).length !== 0);
+//   const daysName= filteredArray.map((d)=> d.day)
+//   setArrayDay(daysName)
+//   console.log("arrayDay" ,arrayDay)
+
+// }, [chooseDays])
+
+
 function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
 
   const dates=[];
@@ -76,12 +90,18 @@ if(times==2){
   repeat=8;
 }
 
+  const filteredArray = days.filter((obj) => Object.keys(obj).length !== 0);
+  const daysName= filteredArray.map((d)=> d.day);
+
+
+
 if(repeatType=="weekly" ||(repeatType=="customized" && endType=="endDate")){
 
 if (repeatType=="weekly"){
   endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
   const today= startDate.getDay()
-days.push(today);
+  console.log("daysname", daysName)
+  daysName.push(today);
 }
 
 if(repeatType=="customized" && endType=="endDate"){
@@ -91,7 +111,7 @@ if(repeatType=="customized" && endType=="endDate"){
 }
 
 while (startDate <= endDate) {
-if(days.includes(startDate.getDay())){
+if(daysName.includes(startDate.getDay())){
   let currentDate= new Date(startDate);
   dates.push(currentDate)
 }
@@ -104,7 +124,7 @@ if(repeatType=="customized" && endType=="endNumTimes"){
 let counter= 0;
 while (startDate <= endDate && counter< repeatTimesEnd) {
 
-  if(days.includes(startDate.getDay())){
+  if(daysName.includes(startDate.getDay())){
     let currentDate= new Date(startDate);
     dates.push(currentDate)
     counter++
