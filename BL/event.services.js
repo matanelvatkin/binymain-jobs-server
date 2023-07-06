@@ -20,7 +20,7 @@ if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventDat
 else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeat=="weeks")){
   const weekDaysList=
   weeklyRepetition(startDate, eventData.repeatType,  eventData.repeatTimes, eventData.repeatSettingsPersonal.type,
-    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd, eventData.day)
+    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd, eventData.days)
     eventData.date= weekDaysList;
 }
   else {
@@ -141,7 +141,7 @@ return dates;
 async function createNewEvent(eventData) {
   var dates = [];
   let repeat = 1;
-  const days = eventData.day ? getDays(eventData.day) : null;
+  const days = eventData.days ? getDays(eventData.days) : null;
   switch (eventData.repeatType) {
     case " אירוע יומי":
       repeat = 1;

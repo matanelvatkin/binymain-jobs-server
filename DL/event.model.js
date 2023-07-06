@@ -35,7 +35,7 @@ const eventSchema = new mongoose.Schema({
     },
   ],
   deletedDate: [{ type: Date }],
-  day: [],
+  days: [],
   personalRepeat:{type: String},
   repeatSettingsPersonal: { type: { type: String }, dateEnd: { type: Object }, timesEnd:{type:Number} },
 
