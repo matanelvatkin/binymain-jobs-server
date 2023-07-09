@@ -65,19 +65,6 @@ if (repeatType=="customized"){
  return dates;
  }
 
-    // const days = [{value: "א",nameDay:"ראשון", day:0}, {value: "ב",nameDay:"שני", day: 1}, {value:"ג", nameDay:"שלישי", day:2},
-    // {value: "ד", nameDay:"רביעי",day: 3}, {value: "ה", nameDay:"חמישי", day:4 }, {value:"ו",nameDay:"שישי", day:5 },
-    // {value:"ש", nameDay:"שבת", day: 6}];
-// useEffect(()=>{
-//   console.log("chooseDays", chooseDays)
-//   const filteredArray = chooseDays.filter((obj) => Object.keys(obj).length !== 0);
-//   const daysName= filteredArray.map((d)=> d.day)
-//   setArrayDay(daysName)
-//   console.log("arrayDay" ,arrayDay)
-
-// }, [chooseDays])
-
-
 function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
 
   const dates=[];
