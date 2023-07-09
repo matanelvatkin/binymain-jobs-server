@@ -166,8 +166,9 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
           })
       );
     }
-    
-    const event = await eventService.createNewEvent(dataEvent);
+    console.log({ dataEvent });
+    // const event = await eventService.createNewEvent(dataEvent);
+    const event = await eventService.newCreateNewEvent(dataEvent);
     res.send(event);
     sendMail(
       ADMIN_MAIL,
