@@ -172,7 +172,7 @@ async function findEvent(page, search, user) {
   }
   
   if (!user||user.userType!=="admin") {
-    filterModel.status = { $regex: "published" };
+    filterModel.status = "published" ;
   }
 
 
@@ -215,7 +215,9 @@ async function findEventSearch (location,btnDates,categories,audiences,page, use
   };
 
   if (typeof location === 'string') {
-    matchQuery.place = { $regex: location };
+    if(location.length>0){
+    matchQuery.place = location
+  }
   } else if(Array.isArray(location)){
     matchQuery.place = { $in: location };
   } else{
@@ -224,8 +226,9 @@ async function findEventSearch (location,btnDates,categories,audiences,page, use
   
 
   if (!user||user.userType!=="admin") {
-    matchQuery.status = { $regex: "published" };
+    matchQuery.status = "published" ;
   }
+  
   if (categories.length > 0) {
     matchQuery.categories = { $in: categories };
   }
