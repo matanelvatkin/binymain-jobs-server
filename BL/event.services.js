@@ -3,11 +3,132 @@ const mailInterface = require('./emailInterface')
 const eventModel = require('../DL/event.model');
 const settingService = require("../BL/setting.services");
 const errController = require('../errController');
+const { count } = require("../DL/setting.model");
+
+
+async function newCreateNewEvent(eventData){
+  const dates=[];
+  let startDate = new Date(eventData.date);
+
+if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventData.personalRepeat=="days"){
+  console.log(startDate)
+ const dayList=
+  dailyRepetition(startDate, eventData.repeatTimes, eventData.repeatType, eventData.repeatSettingsPersonal.type,
+    eventData.repeatSettingsPersonal.dateEnd.date, eventData.repeatSettingsPersonal.timesEnd);
+    eventData.date=dayList;
+  }
+else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeat=="weeks")){
+  const weekDaysList=
+  weeklyRepetition(startDate, eventData.repeatType,  eventData.repeatTimes, eventData.repeatSettingsPersonal.type,
+    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd, eventData.days)
+    eventData.date= weekDaysList;
+}
+  else {
+      console.log("disposable")
+        dates.push(new Date(startDate));
+        eventData.date = dates;
+      }
+  const newEvent = await eventController.create(eventData);
+  console.log(eventData.date)
+  console.log(newEvent)
+  return newEvent;
+}
+
+
+ function dailyRepetition (startDate, repeatTimes, repeatType, endType, repeatDateEnd, repeatTimesEnd){
+  // startDate = new Date(startDate);
+  const dates=[];
+  let endDate=new Date();
+  const times= Number(repeatTimes);
+
+
+  if(repeatType=="daily"){
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+  }
+if (repeatType=="customized"){
+  if(endType=="endDate"){
+    endDate= new Date(repeatDateEnd); 
+    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
+  }
+  else{
+    endDate= new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()+ ((repeatTimesEnd-1)*times)+1);
+    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
+    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
+  }
+}
+  while (startDate <= endDate) {
+    let currentDate= new Date(startDate);
+  dates.push(currentDate)
+    startDate= new Date( startDate.setDate(startDate.getDate() + times));
+  }
+ return dates;
+ }
+
+function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
+
+  const dates=[];
+  let endDate=new Date();
+  let repeat= 1;
+
+ let times= repeatTimes; 
+
+if(times==2){
+  repeat=8;
+}
+
+  const filteredArray = days.filter((obj) => Object.keys(obj).length !== 0);
+  const daysName= filteredArray.map((d)=> d.day);
+
+
+
+if(repeatType=="weekly" ||(repeatType=="customized" && endType=="endDate")){
+
+if (repeatType=="weekly"){
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
+  const today= startDate.getDay()
+  console.log("daysname", daysName)
+  daysName.push(today);
+}
+
+if(repeatType=="customized" && endType=="endDate"){
+  endDate= new Date(repeatDateEnd.date); 
+  endDate<=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
+}
+
+while (startDate <= endDate) {
+if(daysName.includes(startDate.getDay())){
+  let currentDate= new Date(startDate);
+  dates.push(currentDate)
+}
+startDate.getDay()==6?startDate= new Date(startDate.setDate(startDate.getDate() + repeat)):
+startDate=new Date(startDate.setDate(startDate.getDate()+1));
+}
+}
+if(repeatType=="customized" && endType=="endNumTimes"){
+  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+let counter= 0;
+while (startDate <= endDate && counter< repeatTimesEnd) {
+
+  if(daysName.includes(startDate.getDay())){
+    let currentDate= new Date(startDate);
+    dates.push(currentDate)
+    counter++
+  }
+  startDate.getDay()==6?startDate= new Date( startDate.setDate(startDate.getDate() + repeat)):
+  startDate=new Date(startDate.setDate(startDate.getDate()+1));
+  }
+}
+return dates;
+}
+
+
 
 async function createNewEvent(eventData) {
   var dates = [];
   let repeat = 1;
-  const days = eventData.day ? getDays(eventData.day) : null;
+  const days = eventData.days ? getDays(eventData.days) : null;
   switch (eventData.repeatType) {
     case " אירוע יומי":
       repeat = 1;
@@ -310,6 +431,7 @@ async function sendEventDetailsToAdvertiser(email, _id) {
 
 
 module.exports = {
+  newCreateNewEvent,
   createNewEvent,
   findEvent,
   findEventByID,
