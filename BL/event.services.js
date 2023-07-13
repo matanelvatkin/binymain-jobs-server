@@ -1,129 +1,204 @@
 const eventController = require("../DL/event.controller");
-const mailInterface = require('./emailInterface')
-const eventModel = require('../DL/event.model');
+const mailInterface = require("./emailInterface");
+const eventModel = require("../DL/event.model");
 const settingService = require("../BL/setting.services");
-const errController = require('../errController');
+const errController = require("../errController");
 const { count } = require("../DL/setting.model");
 
-
-async function newCreateNewEvent(eventData){
-  const dates=[];
+async function newCreateNewEvent(eventData) {
+  const dates = [];
   let startDate = new Date(eventData.date);
 
-if(eventData.repeatType=="daily"|| eventData.repeatType=="customized"&& eventData.personalRepeat=="days"){
-  console.log(startDate)
- const dayList=
-  dailyRepetition(startDate, eventData.repeatTimes, eventData.repeatType, eventData.repeatSettingsPersonal.type,
-    eventData.repeatSettingsPersonal.dateEnd.date, eventData.repeatSettingsPersonal.timesEnd);
-    eventData.date=dayList;
+  if (
+    eventData.repeatType == "daily" ||
+    (eventData.repeatType == "customized" && eventData.personalRepeat == "days")
+  ) {
+    console.log(startDate);
+    const dayList = dailyRepetition(
+      startDate,
+      eventData.repeatTimes,
+      eventData.repeatType,
+      eventData.repeatSettingsPersonal.type,
+      eventData.repeatSettingsPersonal.dateEnd.date,
+      eventData.repeatSettingsPersonal.timesEnd
+    );
+    eventData.date = dayList;
+  } else if (
+    eventData.repeatType == "weekly" ||
+    (eventData.repeatType == "customized" &&
+      eventData.personalRepeat == "weeks")
+  ) {
+    const weekDaysList = weeklyRepetition(
+      startDate,
+      eventData.repeatType,
+      eventData.repeatTimes,
+      eventData.repeatSettingsPersonal.type,
+      eventData.repeatSettingsPersonal.dateEnd,
+      eventData.repeatSettingsPersonal.timesEnd,
+      eventData.days
+    );
+    eventData.date = weekDaysList;
+  } else {
+    console.log("disposable");
+    dates.push(new Date(startDate));
+    eventData.date = dates;
   }
-else if(eventData.repeatType=="weekly" ||(eventData.repeatType=="customized" && eventData.personalRepeat=="weeks")){
-  const weekDaysList=
-  weeklyRepetition(startDate, eventData.repeatType,  eventData.repeatTimes, eventData.repeatSettingsPersonal.type,
-    eventData.repeatSettingsPersonal.dateEnd, eventData.repeatSettingsPersonal.timesEnd, eventData.days)
-    eventData.date= weekDaysList;
-}
-  else {
-      console.log("disposable")
-        dates.push(new Date(startDate));
-        eventData.date = dates;
-      }
   const newEvent = await eventController.create(eventData);
-  console.log(eventData.date)
-  console.log(newEvent)
+  console.log(eventData.date);
+  console.log(newEvent);
   return newEvent;
 }
 
-
- function dailyRepetition (startDate, repeatTimes, repeatType, endType, repeatDateEnd, repeatTimesEnd){
+function dailyRepetition(
+  startDate,
+  repeatTimes,
+  repeatType,
+  endType,
+  repeatDateEnd,
+  repeatTimesEnd
+) {
   // startDate = new Date(startDate);
-  const dates=[];
-  let endDate=new Date();
-  const times= Number(repeatTimes);
+  const dates = [];
+  let endDate = new Date();
+  const times = Number(repeatTimes);
 
-
-  if(repeatType=="daily"){
-  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
+  if (repeatType == "daily") {
+    endDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth() + 1,
+      startDate.getDate()
+    );
   }
-if (repeatType=="customized"){
-  if(endType=="endDate"){
-    endDate= new Date(repeatDateEnd); 
-    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
-    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
+  if (repeatType == "customized") {
+    if (endType == "endDate") {
+      endDate = new Date(repeatDateEnd);
+      endDate <
+      new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        startDate.getDate()
+      )
+        ? endDate
+        : (endDate = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            startDate.getDate()
+          ));
+    } else {
+      endDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate() + (repeatTimesEnd - 1) * times + 1
+      );
+      endDate <
+      new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        startDate.getDate()
+      )
+        ? endDate
+        : (endDate = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            startDate.getDate()
+          ));
+    }
   }
-  else{
-    endDate= new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()+ ((repeatTimesEnd-1)*times)+1);
-    endDate<new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
-    endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
-  }
-}
   while (startDate <= endDate) {
-    let currentDate= new Date(startDate);
-  dates.push(currentDate)
-    startDate= new Date( startDate.setDate(startDate.getDate() + times));
+    let currentDate = new Date(startDate);
+    dates.push(currentDate);
+    startDate = new Date(startDate.setDate(startDate.getDate() + times));
   }
- return dates;
- }
-
-function weeklyRepetition(startDate, repeatType, repeatTimes,endType, repeatDateEnd, repeatTimesEnd, days){
-
-  const dates=[];
-  let endDate=new Date();
-  let repeat= 1;
-
- let times= repeatTimes; 
-
-if(times==2){
-  repeat=8;
+  return dates;
 }
+
+function weeklyRepetition(
+  startDate,
+  repeatType,
+  repeatTimes,
+  endType,
+  repeatDateEnd,
+  repeatTimesEnd,
+  days
+) {
+  const dates = [];
+  let endDate = new Date();
+  let repeat = 1;
+
+  let times = repeatTimes;
+
+  if (times == 2) {
+    repeat = 8;
+  }
 
   const filteredArray = days.filter((obj) => Object.keys(obj).length !== 0);
-  const daysName= filteredArray.map((d)=> d.day);
+  const daysName = filteredArray.map((d) => d.day);
 
+  if (
+    repeatType == "weekly" ||
+    (repeatType == "customized" && endType == "endDate")
+  ) {
+    if (repeatType == "weekly") {
+      endDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        startDate.getDate() - 1
+      );
+      const today = startDate.getDay();
+      console.log("daysname", daysName);
+      daysName.push(today);
+    }
 
+    if (repeatType == "customized" && endType == "endDate") {
+      endDate = new Date(repeatDateEnd.date);
+      endDate <=
+      new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        startDate.getDate()
+      )
+        ? endDate
+        : (endDate = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            startDate.getDate()
+          ));
+    }
 
-if(repeatType=="weekly" ||(repeatType=="customized" && endType=="endDate")){
-
-if (repeatType=="weekly"){
-  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()-1);
-  const today= startDate.getDay()
-  console.log("daysname", daysName)
-  daysName.push(today);
-}
-
-if(repeatType=="customized" && endType=="endDate"){
-  endDate= new Date(repeatDateEnd.date); 
-  endDate<=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())?endDate:
-  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate())
-}
-
-while (startDate <= endDate) {
-if(daysName.includes(startDate.getDay())){
-  let currentDate= new Date(startDate);
-  dates.push(currentDate)
-}
-startDate.getDay()==6?startDate= new Date(startDate.setDate(startDate.getDate() + repeat)):
-startDate=new Date(startDate.setDate(startDate.getDate()+1));
-}
-}
-if(repeatType=="customized" && endType=="endNumTimes"){
-  endDate=new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate());
-let counter= 0;
-while (startDate <= endDate && counter< repeatTimesEnd) {
-
-  if(daysName.includes(startDate.getDay())){
-    let currentDate= new Date(startDate);
-    dates.push(currentDate)
-    counter++
+    while (startDate <= endDate) {
+      if (daysName.includes(startDate.getDay())) {
+        let currentDate = new Date(startDate);
+        dates.push(currentDate);
+      }
+      startDate.getDay() == 6
+        ? (startDate = new Date(
+            startDate.setDate(startDate.getDate() + repeat)
+          ))
+        : (startDate = new Date(startDate.setDate(startDate.getDate() + 1)));
+    }
   }
-  startDate.getDay()==6?startDate= new Date( startDate.setDate(startDate.getDate() + repeat)):
-  startDate=new Date(startDate.setDate(startDate.getDate()+1));
+  if (repeatType == "customized" && endType == "endNumTimes") {
+    endDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth() + 1,
+      startDate.getDate()
+    );
+    let counter = 0;
+    while (startDate <= endDate && counter < repeatTimesEnd) {
+      if (daysName.includes(startDate.getDay())) {
+        let currentDate = new Date(startDate);
+        dates.push(currentDate);
+        counter++;
+      }
+      startDate.getDay() == 6
+        ? (startDate = new Date(
+            startDate.setDate(startDate.getDate() + repeat)
+          ))
+        : (startDate = new Date(startDate.setDate(startDate.getDate() + 1)));
+    }
   }
+  return dates;
 }
-return dates;
-}
-
-
 
 async function createNewEvent(eventData) {
   var dates = [];
@@ -259,92 +334,110 @@ function getDatesWithNumberOfOccurrences(
   return dates;
 }
 
-
-async function pagination (filterModel, page , startDate ,endDate){
-  const pageSize = 10
+async function pagination(filterModel, page, startDate, endDate) {
+  const pageSize = 10;
   const skipCount = (page - 1) * pageSize;
-  const results = {}
-  const endIndex = page * pageSize
+  const results = {};
+  const endIndex = page * pageSize;
   const Query = [
     { $match: filterModel },
-    { $addFields: { date: { $filter: { input: "$date", as: "date", cond: { $gte: ["$$date", startDate] } } } } },
+    {
+      $addFields: {
+        date: {
+          $filter: {
+            input: "$date",
+            as: "date",
+            cond: { $gte: ["$$date", startDate] },
+          },
+        },
+      },
+    },
     { $sort: { date: 1 } },
     { $skip: skipCount },
-    { $limit: pageSize }
-  ]
-  results.startDate= startDate
-  results.endDate= endDate
-  results.event = await eventModel.aggregate(Query)
+    { $limit: pageSize },
+  ];
+  results.startDate = startDate;
+  results.endDate = endDate;
+  results.event = await eventModel.aggregate(Query);
 
-  if (endIndex <  await eventModel.find(filterModel).countDocuments().exec()) {
-    results.nextPage = page + 1
+  if (endIndex < (await eventModel.find(filterModel).countDocuments().exec())) {
+    results.nextPage = page + 1;
   }
 
   return results;
 }
 
-  
-
 async function findEvent(page, search, user) {
   const now = new Date();
   const filterModel = {
-    $or: [{ place: { $regex: search, $options: "i" } }, { eventName: { $regex: search, $options: "i" } }],
-    date: { $gte: now}
-  }
-  
-  if (!user||user.userType!=="admin") {
+    $or: [
+      { place: { $regex: search, $options: "i" } },
+      { eventName: { $regex: search, $options: "i" } },
+    ],
+    date: { $gte: now },
+  };
+
+  if (!user || user.userType !== "admin") {
     filterModel.status = { $regex: "published" };
   }
 
-
-  return pagination(filterModel,page,now)
+  return pagination(filterModel, page, now);
 }
 
-async function findEventSearch (location,btnDates,categories,audiences,page, user) {
+async function findEventSearch(
+  location,
+  btnDates,
+  categories,
+  audiences,
+  page,
+  user
+) {
   const now = new Date();
-// startDate endDate הגדרת 
-  const fixTimezoneHour = -3
-  const fixTimezoneMinute = 60*fixTimezoneHour
+  // startDate endDate הגדרת
+  const fixTimezoneHour = -3;
+  const fixTimezoneMinute = 60 * fixTimezoneHour;
   let dayPas = new Date(now.getTime() + fixTimezoneMinute * 60 * 1000);
-  dayPas.setHours(24+fixTimezoneHour, 0, 0, 0);
+  dayPas.setHours(24 + fixTimezoneHour, 0, 0, 0);
   let startDate;
   let endDate;
-  if(btnDates==="allDate"){
-    startDate=now ;
-    endDate = new Date(now.getFullYear() + 100, now.getMonth(), now.getDate())}// תאריך סיום בעוד 100 שנה
-  else if(btnDates==="today"){
-    startDate=now
-    endDate = dayPas
-  }
-  else if (btnDates === "tomorrow") {
-    startDate = dayPas
+  if (btnDates === "allDate") {
+    startDate = now;
+    endDate = new Date(now.getFullYear() + 100, now.getMonth(), now.getDate());
+  } // תאריך סיום בעוד 100 שנה
+  else if (btnDates === "today") {
+    startDate = now;
+    endDate = dayPas;
+  } else if (btnDates === "tomorrow") {
+    startDate = dayPas;
     endDate = new Date(dayPas.getTime() + 24 * 60 * 60 * 1000);
-  }
-  else if (btnDates === "thisWeek") {
-    startDate=now
-    const fixDateOfDay =  new Date(now.getTime() + fixTimezoneMinute * 60 * 1000)
+  } else if (btnDates === "thisWeek") {
+    startDate = now;
+    const fixDateOfDay = new Date(
+      now.getTime() + fixTimezoneMinute * 60 * 1000
+    );
     const dayOfWeek = fixDateOfDay.getDay();
-    const daysUntilEndOfWeek = (13 - dayOfWeek ) % 7;
-    endDate = new Date(dayPas.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000);
+    const daysUntilEndOfWeek = (13 - dayOfWeek) % 7;
+    endDate = new Date(
+      dayPas.getTime() + daysUntilEndOfWeek * 24 * 60 * 60 * 1000
+    );
   } else {
-    throw errController.errMessage.SETTING_NOT_FOUND
+    throw errController.errMessage.SETTING_NOT_FOUND;
   }
-    //סוף 
-  
+  //סוף
+
   const matchQuery = {
-    date: { $elemMatch: { $gte: startDate, $lt: endDate } }
+    date: { $elemMatch: { $gte: startDate, $lt: endDate } },
   };
 
-  if (typeof location === 'string') {
+  if (typeof location === "string") {
     matchQuery.place = { $regex: location };
-  } else if(Array.isArray(location)){
+  } else if (Array.isArray(location)) {
     matchQuery.place = { $in: location };
-  } else{
-    throw errController.errMessage.SETTING_NOT_FOUND
+  } else {
+    throw errController.errMessage.SETTING_NOT_FOUND;
   }
-  
 
-  if (!user||user.userType!=="admin") {
+  if (!user || user.userType !== "admin") {
     matchQuery.status = { $regex: "published" };
   }
   if (categories.length > 0) {
@@ -354,7 +447,7 @@ async function findEventSearch (location,btnDates,categories,audiences,page, use
     matchQuery.audiences = { $in: audiences };
   }
 
-  return pagination (matchQuery,page,startDate,endDate)
+  return pagination(matchQuery, page, startDate, endDate);
 }
 
 async function findEventById(id) {
@@ -364,17 +457,19 @@ async function findEventById(id) {
 
 async function findEventByID(id, currentDate) {
   const event = await eventController.readOne({ _id: id });
-  const futureDates = event.date.filter((date) => new Date(date) >= currentDate);
-event.date = futureDates.slice(0, 1);
-return event;
+  const futureDates = event.date.filter(
+    (date) => new Date(date) >= currentDate
+  );
+  event.date = futureDates.slice(0, 1);
+  return event;
 }
 
 async function updateStatusEvent(id, newData) {
-    const updateEvent = await eventController.update(id, newData);
-    const event = await findEventById(id);
-    console.log("eventtttt",event);
-    sendEventDetailsToAdvertiser(event.advertiser.email,event._id)
-    return updateEvent;
+  const updateEvent = await eventController.update(id, newData);
+  const event = await findEventById(id);
+  console.log("eventtttt", event);
+  sendEventDetailsToAdvertiser(event.advertiser.email, event._id);
+  return updateEvent;
 }
 
 async function eventIsExists(id) {
@@ -383,18 +478,35 @@ async function eventIsExists(id) {
 
 async function sendEventDetailsToAdvertiser(email, _id) {
   const eventData = await findEventById(_id);
-  const { eventName, summary, advertiser, categories, audiences, registrationPageURL, date, beginningTime, finishTime, place,cardImageURL,coverImageURL } = eventData;
+  const {
+    eventName,
+    summary,
+    advertiser,
+    categories,
+    audiences,
+    registrationPageURL,
+    date,
+    beginningTime,
+    finishTime,
+    place,
+    cardImageURL,
+    coverImageURL,
+  } = eventData;
 
-  const categoriesNames = await settingService.getCategorysNames(categories)
-  const audiencesNames = await settingService.getAudiencesNames(audiences)
-  const dateTimeString = await date.map(v=>new Date(v).toLocaleDateString('en-US')).join(', ')
+  const categoriesNames = await settingService.getCategorysNames(categories);
+  const audiencesNames = await settingService.getAudiencesNames(audiences);
+  const dateTimeString = await date
+    .map((v) => new Date(v).toLocaleDateString("en-US"))
+    .join(", ");
 
-  const subject = 'פורסם אירוע חדש - hereEvent'
+  const subject = "פורסם אירוע חדש - hereEvent";
   const html = `
 <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-  <h1 style="color: #333; text-align: center;">פרטי אירוע חדש</h1>
+  <h1 style="color: #333; text-align: center;">איזה כיף, האירוע שלך פורסם!/h1>
+  רוע:</strong> ${summary}</p>
+  <p><strong>לצפיה בדף האירוע שלך: </strong> <a href="https://server-vike.vercel.app/viewEvent/${_id}">${eventName}</a></p>
   <div style="background-color: #fff; padding: 20px; border-radius: 5px;">
-    <p>אירוע חדש פורסם על ידך:</p>
+    <p>אלה פרטי האירוע שפרסמת:</p>
     <div style="margin-bottom: 20px;">
       <h3 style="color: #333;">${eventName}</h3>
       <p><strong>מפרסם:</strong> ${advertiser.name}</p>
@@ -403,8 +515,8 @@ async function sendEventDetailsToAdvertiser(email, _id) {
     </div>
     <div style="margin-bottom: 20px;">
       <h3 style="color: #333;">פרטים על האירוע:</h3>
-      <p><strong>קטגוריות:</strong> ${categoriesNames.join(', ')}</p>
-      <p><strong>קהל יעד:</strong> ${audiencesNames.join(', ')}</p>
+      <p><strong>קטגוריות:</strong> ${categoriesNames.join(", ")}</p>
+      <p><strong>קהל יעד:</strong> ${audiencesNames.join(", ")}</p>
       <p><strong>תאריך האירוע:</strong> ${dateTimeString}</p>
       <p><strong>שעות האירוע:</strong> ${beginningTime}-${finishTime}</p>
       <p><strong>מיקום האירוע:</strong> ${place}</p>
@@ -419,13 +531,10 @@ async function sendEventDetailsToAdvertiser(email, _id) {
       </div>
     </div>
   </div>
-</div>`
+</div>`;
 
-  await mailInterface.sendMail(email, subject, html)
-
+  await mailInterface.sendMail(email, subject, html);
 }
-
-
 
 module.exports = {
   newCreateNewEvent,
@@ -435,5 +544,5 @@ module.exports = {
   findEventById,
   sendEventDetailsToAdvertiser,
   updateStatusEvent,
-  findEventSearch
+  findEventSearch,
 };
