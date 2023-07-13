@@ -502,7 +502,7 @@ async function sendEventDetailsToAdvertiser(email, _id) {
   const subject = "פורסם אירוע חדש - hereEvent";
   const html = `
 <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
-  <h1 style="color: #333; text-align: center;">איזה כיף, האירוע שלך פורסם!/h1>
+  <h1 style="color: #333; text-align: center;">איזה כיף, האירוע שלך פורסם!</h1>
   <p><strong>לצפיה בדף האירוע שלך: </strong> <a href="https://server-vike.vercel.app/viewEvent/${_id}">${eventName}</a></p>
   <div style="background-color: #fff; padding: 20px; border-radius: 5px;">
     <p>אלה פרטי האירוע שפרסמת:</p>
