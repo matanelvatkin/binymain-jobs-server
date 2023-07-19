@@ -128,7 +128,7 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
         folder:
           dataEvent.advertiser.email.trim() +
           "/" +
-          dataEvent.eventName.trim() +
+          dataEvent.eventName.trim().replace(/[\/:*?<>|]/,'.') +
           "/cardImageURL",
         transformation: [
           { aspect_ratio: "1.0", crop: "fill" },
@@ -144,7 +144,7 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
         folder:
           dataEvent.advertiser.email.trim() +
           "/" +
-          dataEvent.eventName.trim() +
+          dataEvent.eventName.trim().replace(/[\/:*?<>|]/,'.') +
           "/coverImageURL",
         transformation: [
           { aspect_ratio: "1.77778", crop: "fill" },
@@ -161,7 +161,7 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
             folder:
               dataEvent.advertiser.email.trim() +
               "/" +
-              dataEvent.eventName.trim() +
+              dataEvent.eventName.trim().replace(/[\/:*?<>|]/,'.') +
               "/gallery",
           })
       );
