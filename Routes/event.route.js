@@ -173,7 +173,7 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
     sendMail(
       ADMIN_MAIL,
       "אירוע חדש לאישור",
-      `https://server-vike.vercel.app/viewEvent/${event._id}`
+      `${process.env.CLAIENT_DOMAIN}/viewEvent/${event._id}`
     );
   } catch (err) {
     sendError(res, err);
