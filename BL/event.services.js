@@ -499,11 +499,13 @@ async function sendEventDetailsToAdvertiser(email, _id) {
     .map((v) => new Date(v).toLocaleDateString("en-US"))
     .join(", ");
 
-  const subject = "פורסם אירוע חדש - hereEvent";
+  const subject = "פורסם אירוע חדש - KorePo";
   const html = `
 <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
   <h1 style="color: #333; text-align: center;">איזה כיף, האירוע שלך פורסם!</h1>
-  <button type="button" style="margin: 10px;"><h2> <a href="${process.env.CLAIENT_DOMAIN}/viewEvent/${_id}">לצפיה בדף האירוע שלך: ${eventName}</a></h2></button>
+  <button type="button" style="margin: 10px;"><h2> <a href="${
+    process.env.CLAIENT_DOMAIN
+  }/viewEvent/${_id}">לצפיה בדף האירוע שלך: ${eventName}</a></h2></button>
   <div style="background-color: #fff; padding: 20px; border-radius: 5px;">
     <p>אלה פרטי האירוע שפרסמת:</p>
     <div style="margin-bottom: 20px;">
