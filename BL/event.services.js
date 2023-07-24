@@ -535,7 +535,6 @@ async function sendEventDetailsToAdvertiser(email, _id) {
   await mailInterface.sendMail(email, subject, html);
 }
 
-sendEventDetailsToAdvertiser("sapircafri@gmail.com", "64b7c91892d3e5b7964258e9")
 module.exports = {
   newCreateNewEvent,
   createNewEvent,
