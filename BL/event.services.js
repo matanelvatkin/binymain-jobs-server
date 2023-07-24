@@ -499,7 +499,7 @@ async function sendEventDetailsToAdvertiser(email, _id) {
     .map((v) => new Date(v).toLocaleDateString("en-US"))
     .join(", ");
 
-  const subject = "פורסם אירוע חדש - hereEvent";
+  const subject = "פורסם אירוע חדש - KorePo";
   const html = `
 <div dir="RTL" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5; padding: 20px; border-radius: 5px;">
   <h1 style="color: #333; text-align: center;">איזה כיף, האירוע שלך פורסם!</h1>
@@ -535,6 +535,7 @@ async function sendEventDetailsToAdvertiser(email, _id) {
   await mailInterface.sendMail(email, subject, html);
 }
 
+sendEventDetailsToAdvertiser("sapircafri@gmail.com", "64b7c91892d3e5b7964258e9")
 module.exports = {
   newCreateNewEvent,
   createNewEvent,
