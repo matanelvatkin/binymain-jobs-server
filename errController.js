@@ -19,7 +19,7 @@ const errMessage = Object.freeze({
   SETTING_NOT_FOUND: err(400, "setting not found"),
   CAN_NOT_GET_URL: err(999, "can't get url"),
   CAN_NOT_CREATE_FOLDER: err(999, "can't create folder"),
-  CAN_NOT_CHANGE_FILE_NAME: err(999, "can't chenge file name"),
+  CAN_NOT_CHANGE_FILE_NAME: err(999, "can't change file name"),
   IMG_CAN_NOT_BE_PROCESSED: err(999, "can't process image"),
 });
 
