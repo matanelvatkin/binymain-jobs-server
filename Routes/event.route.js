@@ -138,7 +138,6 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
         });
         dataEvent.cardImageURL = result.secure_url;
       }
-      ``;
       if (coverImageURL) {
         const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
           folder:
@@ -182,7 +181,7 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
       `${process.env.CLAIENT_DOMAIN}/viewEvent/${event._id}`
     );
   } catch (err) {
-    sendError(res, err);
+    sendError(res, err, dataEvent.advertiser.email.trim());
   }
 });
 
