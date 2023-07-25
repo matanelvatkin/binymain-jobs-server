@@ -53,7 +53,7 @@ async function forgetPassword(email, code) {
       <p>לאפס את הקוד אנא הזן קוד זה בטופס איפוס הסיסמה כדי להגדיר סיסמה חדשה.</p>
       <p>אם לא ביקשת איפוס סיסמה, אנא התעלם מאימייל זה.</p>
       <p>,תודה</p>
-      <p> HereEvent </p>
+      <p> KorePo </p>
     </div>`
   await mailInterface.sendMail(email, subject, html)
 
