@@ -138,7 +138,6 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
         });
         dataEvent.cardImageURL = result.secure_url;
       }
-      ``;
       if (coverImageURL) {
         const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
           folder:
