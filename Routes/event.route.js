@@ -1,7 +1,7 @@
 const express = require("express");
 const eventRouter = express.Router();
 const eventService = require("../BL/event.services");
-const userService  = require("../BL/user.services" );
+const userService = require("../BL/user.services");
 const multer = require("multer");
 const fs = require("fs");
 const cloudinary = require("cloudinary").v2;
@@ -12,7 +12,7 @@ const { log } = require("console");
 const { sendMail } = require("../BL/emailInterface");
 const URL = "localhost:5000";
 const DIR = "upload";
-const userToken = userService.checkToken
+const userToken = userService.checkToken;
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -59,26 +59,26 @@ const multiUpload = upload.fields([
   { name: "gallery", maxCount: 5 },
 ]);
 
-eventRouter.post("" ,userToken ,async (req, res) => {
+eventRouter.post("", userToken, async (req, res) => {
   try {
     const search = req.body.search || "";
     const page = parseInt(req.body.page) || 1;
-    const user = req.user
-    const data = await eventService.findEvent(page , search, user);
+    const user = req.user;
+    const data = await eventService.findEvent(page, search, user);
     res.status(200).send(data);
   } catch (err) {
     sendError(res, err);
   }
 });
 
-eventRouter.post("/search",userToken , async (req, res) => {
+eventRouter.post("/search", userToken, async (req, res) => {
   try {
     const location = req.body.location || "";
     const btnDates = req.body.btnDates || "";
     const categories = req.body.categories || [];
     const audiences = req.body.audiences || [];
     const page = parseInt(req.body.page) || 1;
-    const user = req.user
+    const user = req.user;
     const data = await eventService.findEventSearch(
       location,
       btnDates,
@@ -122,51 +122,56 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
   try {
     const { cardImageURL, coverImageURL, gallery } = req.files;
     const dataEvent = JSON.parse(req.body.values);
-
-    if (cardImageURL) {
-      const result = await cloudinary.uploader.upload(cardImageURL[0].path, {
-        folder:
-          dataEvent.advertiser.email.trim() +
-          "/" +
-          dataEvent.eventName.trim() +
-          "/cardImageURL",
-        transformation: [
-          { aspect_ratio: "1.0", crop: "fill" },
-          { quality: "auto" },
-          { fetch_format: "auto" },
-        ],
-      });
-      dataEvent.cardImageURL = result.secure_url;
+    try {
+      if (cardImageURL) {
+        const result = await cloudinary.uploader.upload(cardImageURL[0].path, {
+          folder:
+            dataEvent.advertiser.email.trim() +
+            "/" +
+            dataEvent.eventName.trim() +
+            "/cardImageURL",
+          transformation: [
+            { aspect_ratio: "1.0", crop: "fill" },
+            { quality: "auto" },
+            { fetch_format: "auto" },
+          ],
+        });
+        dataEvent.cardImageURL = result.secure_url;
+      }
+      if (coverImageURL) {
+        const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
+          folder:
+            dataEvent.advertiser.email.trim() +
+            "/" +
+            dataEvent.eventName.trim() +
+            "/coverImageURL",
+          transformation: [
+            { aspect_ratio: "1.77778", crop: "fill" },
+            { quality: "auto" },
+            { fetch_format: "auto" },
+          ],
+        });
+        dataEvent.coverImageURL = result.secure_url;
+      }
+      if (gallery) {
+        dataEvent.gallery = gallery.map(
+          async (file) =>
+            await cloudinary.uploader.upload(file.path, {
+              folder:
+                dataEvent.advertiser.email.trim() +
+                "/" +
+                dataEvent.eventName.trim() +
+                "/gallery",
+            })
+        );
+      }
+      console.log({ dataEvent });
+    } catch (error) {
+      throw {
+        code: 999,
+        message: "משהו לא הסתדר, בבקשה נסה שנית",
+      };
     }
-    ``;
-    if (coverImageURL) {
-      const result = await cloudinary.uploader.upload(coverImageURL[0].path, {
-        folder:
-          dataEvent.advertiser.email.trim() +
-          "/" +
-          dataEvent.eventName.trim() +
-          "/coverImageURL",
-        transformation: [
-          { aspect_ratio: "1.77778", crop: "fill" },
-          { quality: "auto" },
-          { fetch_format: "auto" },
-        ],
-      });
-      dataEvent.coverImageURL = result.secure_url;
-    }
-    if (gallery) {
-      dataEvent.gallery = gallery.map(
-        async (file) =>
-          await cloudinary.uploader.upload(file.path, {
-            folder:
-              dataEvent.advertiser.email.trim() +
-              "/" +
-              dataEvent.eventName.trim() +
-              "/gallery",
-          })
-      );
-    }
-    console.log({ dataEvent });
     // const event = await eventService.createNewEvent(dataEvent);
     const event = await eventService.newCreateNewEvent(dataEvent);
     res.send(event);
@@ -176,7 +181,7 @@ eventRouter.post("/createvent", multiUpload, async (req, res) => {
       `${process.env.CLAIENT_DOMAIN}/viewEvent/${event._id}`
     );
   } catch (err) {
-    sendError(res, err);
+    sendError(res, err, dataEvent.advertiser.email.trim());
   }
 });
 
