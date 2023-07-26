@@ -8,9 +8,18 @@ const jwt = require('jsonwebtoken');
 async function createUser(newUserData) {
   const newUser = await userController.create(newUserData);
   if (newUser) {
-    return {
-      newUser: newUser
-    };
+    try {
+      const token = jwt.sign(
+        { email: newUser.email, userType: newUser.userType },
+        process.env.JWT_SECRET,
+        { expiresIn: '1440h' });
+        console.log(token);
+      return { user: newUser, token };
+
+    } catch (error) {
+      console.error('Error generating Token:', err);
+      return { error: 'Error generating JWT token' };
+    }
   } else {
     return {email: newUserData.email}
   }
