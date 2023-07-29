@@ -378,7 +378,7 @@ async function findEvent(page, search, user) {
   };
 
   if (!user || user.userType !== "admin") {
-    filterModel.status = { $regex: "published" };
+    filterModel.status = "published" ;
   }
 
   return pagination(filterModel, page, now);
@@ -429,17 +429,21 @@ async function findEventSearch(
     date: { $elemMatch: { $gte: startDate, $lt: endDate } },
   };
 
-  if (typeof location === "string") {
-    matchQuery.place = { $regex: location };
-  } else if (Array.isArray(location)) {
+  if (typeof location === 'string') {
+    if(location.length>0){
+    matchQuery.place = location
+  }
+  } else if(Array.isArray(location)){
     matchQuery.place = { $in: location };
   } else {
     throw errController.errMessage.SETTING_NOT_FOUND;
   }
+  
 
-  if (!user || user.userType !== "admin") {
-    matchQuery.status = { $regex: "published" };
+  if (!user||user.userType!=="admin") {
+    matchQuery.status = "published" ;
   }
+  
   if (categories.length > 0) {
     matchQuery.categories = { $in: categories };
   }
