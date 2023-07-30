@@ -102,6 +102,11 @@ const eventSchema = new mongoose.Schema({
     type: String,
     enum: ["published", "waiting-for-approval", "invalid", "deleted"],
     default: "waiting-for-approval",
+  },  
+  tag: {
+    type: String,
+    enum: ["event", "food", "attraction","noTag"],
+    default: "noTag",
   },
   createdAt: {
     type: Date,
