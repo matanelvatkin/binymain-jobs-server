@@ -378,7 +378,7 @@ async function findEvent(page, search, user) {
   };
 
   if (!user || user.userType !== "admin") {
-    filterModel.status = "published" ;
+    filterModel.status = "published";
   }
 
   return pagination(filterModel, page, now);
@@ -429,21 +429,20 @@ async function findEventSearch(
     date: { $elemMatch: { $gte: startDate, $lt: endDate } },
   };
 
-  if (typeof location === 'string') {
-    if(location.length>0){
-    matchQuery.place = location
-  }
-  } else if(Array.isArray(location)){
+  if (typeof location === "string") {
+    if (location.length > 0) {
+      matchQuery.place = location;
+    }
+  } else if (Array.isArray(location)) {
     matchQuery.place = { $in: location };
   } else {
     throw errController.errMessage.SETTING_NOT_FOUND;
   }
-  
 
-  if (!user||user.userType!=="admin") {
-    matchQuery.status = "published" ;
+  if (!user || user.userType !== "admin") {
+    matchQuery.status = "published";
   }
-  
+
   if (categories.length > 0) {
     matchQuery.categories = { $in: categories };
   }
@@ -496,7 +495,7 @@ async function sendEventDetailsToAdvertiser(email, _id) {
     cardImageURL,
     coverImageURL,
   } = eventData;
-
+  console.log({ registrationPageURL });
   const categoriesNames = await settingService.getCategorysNames(categories);
   const audiencesNames = await settingService.getAudiencesNames(audiences);
   const dateTimeString = await date
@@ -526,7 +525,11 @@ async function sendEventDetailsToAdvertiser(email, _id) {
       <p><strong>שעות האירוע:</strong> ${beginningTime}-${finishTime}</p>
       <p><strong>מיקום האירוע:</strong> ${place}</p>
       <p><strong>תיאור האירוע:</strong> ${summary}</p>
-      <p><strong>דף הרשמה לאירוע:</strong> <a href="${registrationPageURL}">${registrationPageURL}</a></p>
+     ${
+       registrationPageURL != null
+         ? `<p><strong>דף הרשמה לאירוע:</strong> <a href="${registrationPageURL}">${registrationPageURL}</a></p>`
+         : `<p><strong>לינק לדף הרשמה: </strong>לא הוזן</p>`
+     }
     </div>
     <div>
       <h3 style="color: #333;">תמונות:</h3>
