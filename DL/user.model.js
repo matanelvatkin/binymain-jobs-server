@@ -8,14 +8,23 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
   },
   email: {
     type: String,
   },
+  city: {
+    type: String,
+  },
+  phon: {
+    type: String,
+  },
+  approval: {
+    type: Boolean
+  },
   userType: {
     type: String,
     enum: ['admin', 'regular'],
+    default: 'regular'
   },
   // favourites:
   //   [{
