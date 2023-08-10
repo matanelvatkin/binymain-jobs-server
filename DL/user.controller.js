@@ -9,7 +9,7 @@ async function create(data) {
     if (!user) {
       return await userData.create(data);
     } else {
-      return { error: `האימייל ${user.email} נמצא כבר בשימוש`, Email: user.email };
+      return { error: `האימייל ${user.email} נמצא כבר בשימוש`, email: user.email, userType:user.userType };
     }
   } catch (error) {
     throw error;
