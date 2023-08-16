@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 
 async function create(data) {
   try {
-    const user = await userData.findOne({$or:[ { email:data.email } , { phon: data.phon } ] });
+    const user = await userData.findOne({email:data.email});
     if (!user) {
       return await userData.create(data);
     } else {
