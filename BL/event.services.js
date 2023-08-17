@@ -3,16 +3,10 @@ const mailInterface = require("./emailInterface");
 const eventModel = require("../DL/event.model");
 const settingService = require("../BL/setting.services");
 const errController = require("../errController");
-const { count } = require("../DL/setting.model");
 
 async function newCreateNewEvent(eventData) {
   const dates = [];
   let startDate = new Date(eventData.date);
-  let finishTimeParts = eventData.finishTime.split(":");
-  let finishHours = parseInt(finishTimeParts[0]);
-  let finishMinutes = parseInt(finishTimeParts[1]);
-  startDate.setHours(finishHours, finishMinutes);
-  console.log({ startDate });
   if (
     eventData.repeatType == "daily" ||
     (eventData.repeatType == "customized" && eventData.personalRepeat == "days")
@@ -378,7 +372,6 @@ async function findEvent(page, search, user) {
       { place: { $regex: search, $options: "i" } },
       { eventName: { $regex: search, $options: "i" } },
     ],
-    date: { $slice: -1 }, // Get the last element of the 'date' array
     date: { $gte: now },
   };
 
