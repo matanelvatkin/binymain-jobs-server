@@ -348,16 +348,9 @@ async function pagination(filterModel, page, startDate, endDate) {
             cond: { $gte: ["$$date", startDate] },
           },
         },
-        dateOnlyArray: {
-          $map: {
-            input: "$dateArray",
-            as: "date",
-            in: { $dateToString: { format: "%Y-%m-%d", date: "$$date" } }
-          }
-        }
       },
     },
-    { $sort: { dateOnlyArray: 1 , beginningTime: 1 } },
+    { $sort: { date: 1 } },
     { $skip: skipCount },
     { $limit: pageSize },
   ];
