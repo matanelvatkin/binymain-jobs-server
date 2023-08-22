@@ -62,9 +62,10 @@ const multiUpload = upload.fields([
 eventRouter.post("", userToken, async (req, res) => {
   try {
     const search = req.body.search || "";
+    const tag = req.body.tag 
     const page = parseInt(req.body.page) || 1;
     const user = req.user;
-    const data = await eventService.findEvent(page, search, user);
+    const data = await eventService.findEvent(page, search, user, tag);
     res.status(200).send(data);
   } catch (err) {
     sendError(res, err);
@@ -77,6 +78,7 @@ eventRouter.post("/search", userToken, async (req, res) => {
     const btnDates = req.body.btnDates || "";
     const categories = req.body.categories || [];
     const audiences = req.body.audiences || [];
+    const tag = req.body.tag 
     const page = parseInt(req.body.page) || 1;
     const user = req.user;
     const data = await eventService.findEventSearch(
@@ -85,7 +87,8 @@ eventRouter.post("/search", userToken, async (req, res) => {
       categories,
       audiences,
       page,
-      user
+      user,
+      tag
     );
     res.status(200).send(data);
   } catch (err) {

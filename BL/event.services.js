@@ -350,7 +350,7 @@ async function pagination(filterModel, page, startDate, endDate) {
         },
       },
     },
-    { $sort: { date: 1 } },
+    { $sort: { date: 1 ,beginningTime:1, eventName:1} },
     { $skip: skipCount },
     { $limit: pageSize },
   ];
@@ -365,7 +365,7 @@ async function pagination(filterModel, page, startDate, endDate) {
   return results;
 }
 
-async function findEvent(page, search, user) {
+async function findEvent(page, search, user, tag) {
   const now = new Date();
   const filterModel = {
     $or: [
@@ -374,6 +374,8 @@ async function findEvent(page, search, user) {
     ],
     date: { $gte: now },
   };
+
+  if(tag){filterModel.tag = tag}
 
   if (!user || user.userType !== "admin") {
     filterModel.status = "published";
@@ -388,7 +390,8 @@ async function findEventSearch(
   categories,
   audiences,
   page,
-  user
+  user,
+  tag
 ) {
   const now = new Date();
   // startDate endDate הגדרת
@@ -426,6 +429,7 @@ async function findEventSearch(
   const matchQuery = {
     date: { $elemMatch: { $gte: startDate, $lt: endDate } },
   };
+  if(tag){matchQuery.tag = tag}
 
   if (typeof location === "string") {
     if (location.length > 0) {
