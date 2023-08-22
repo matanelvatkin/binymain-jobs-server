@@ -375,8 +375,14 @@ async function findEvent(page, search, user, tag) {
     date: { $gte: now },
   };
 
-  if(tag){filterModel.tag = tag}
-
+  if(tag=="event"){
+    let tagUpdate= tag
+    tagUpdate = ["event","noTag"]
+    filterModel.tag = { $in: tagUpdate }
+  } else if(tag){
+    {filterModel.tag = tag}
+  }
+  
   if (!user || user.userType !== "admin") {
     filterModel.status = "published";
   }
@@ -429,7 +435,14 @@ async function findEventSearch(
   const matchQuery = {
     date: { $elemMatch: { $gte: startDate, $lt: endDate } },
   };
-  if(tag){matchQuery.tag = tag}
+
+  if(tag=="event"){
+    let tagUpdate= tag
+    tagUpdate = ["event","noTag"]
+    matchQuery.tag = { $in: tagUpdate }
+  } else if(tag){
+    {matchQuery.tag = tag}
+  }
 
   if (typeof location === "string") {
     if (location.length > 0) {
