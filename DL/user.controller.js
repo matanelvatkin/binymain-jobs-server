@@ -4,18 +4,8 @@ const bcrypt = require('bcrypt')
 
 
 async function create(data) {
-  try {
-    const user = await userData.findOne({email:data.email});
-    if (!user) {
-      return await userData.create(data);
-    } else {
-      return { error: `האימייל ${user.email} נמצא כבר בשימוש`, email: user.email, userType:user.userType };
-    }
-  } catch (error) {
-    throw error;
-  }
-   
-};
+  return await userData.create(data);
+}
 
 
 async function find(user) {
@@ -39,7 +29,7 @@ async function findEmail(email) {
     if (foundUser) {
       return foundUser
     } else {
-      throw new Error('Email not found');
+      return
     }
   } catch (error) {
     throw new Error('Error finding Email');

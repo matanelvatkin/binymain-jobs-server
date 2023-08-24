@@ -8,7 +8,19 @@ const jwt = require('jsonwebtoken');
 const { default: axios } = require("axios");
 
 async function createUser(newUserData) {
-  const newUser = await userController.create(newUserData);
+      const user = await userController.findEmail(newUserData.email);
+      console.log(user);
+      let newUser ={}
+      if (!user) {
+        newUser = await userController.create(newUserData);
+      } else if(!user.password){
+        changePassword(user.email,newUserData.password)
+        newUser ={ email: user.email, userType:user.userType };
+      }
+      else {
+        newUser ={ error: `האימייל ${user.email} נמצא כבר בשימוש`, email: user.email, userType:user.userType };
+      }
+
   if (newUser) {
     try {
       const token = jwt.sign(
@@ -25,8 +37,8 @@ async function createUser(newUserData) {
   } else {
     return {email: newUserData.email}
   }
-  
 }
+
 
 
 async function findUser(user) {
@@ -94,7 +106,7 @@ async function checkToken(req,res,next){
     let result = await verifyToken(token)
     req.user = result
   } catch (error) {
-   console.log("waring, line 78 in user.service.js: don't send authorization in header");
+   console.log("waring, line 100 in user.service.js: don't send authorization in header");
   }
   next()
 }
