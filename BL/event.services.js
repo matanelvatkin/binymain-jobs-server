@@ -367,10 +367,15 @@ async function pagination(filterModel, page, startDate, endDate) {
 
 async function findEvent(page, search, user, tag) {
   const now = new Date();
+  let wordKeys= search.split(/\s+/)
   const filterModel = {
-    $or: [
-      { place: { $regex: search, $options: "i" } },
-      { eventName: { $regex: search, $options: "i" } },
+    $and: [
+      ...wordKeys.map((word) => ({
+        $or: [
+          { place: { $regex: word, $options: "i" } },
+          { eventName: { $regex: word, $options: "i" } },
+        ],
+      })),
     ],
     date: { $gte: now },
   };
