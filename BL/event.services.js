@@ -489,9 +489,10 @@ async function findEventByID(id, currentDate) {
 
 async function updateStatusEvent(id, newData) {
   const updateEvent = await eventController.update(id, newData);
-  const event = await findEventById(id);
-  console.log("eventtttt", event);
-  sendEventDetailsToAdvertiser(event.advertiser.email, event._id);
+  if(newData.status){
+    const event = await findEventById(id);
+    sendEventDetailsToAdvertiser(event.advertiser.email, event._id);
+  }
   return updateEvent;
 }
 
