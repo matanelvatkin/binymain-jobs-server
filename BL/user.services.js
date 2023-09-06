@@ -3,7 +3,9 @@ const bcrypt = require('bcrypt')
 const eventService = require("../BL/event.services");
 const mailInterface = require('./emailInterface')
 
+
 const jwt = require('jsonwebtoken');
+const { default: axios } = require("axios");
 
 async function createUser(newUserData) {
       const user = await userController.findEmail(newUserData.email);
@@ -149,6 +151,66 @@ async function checkUserType(token) {
   }
 }
 
+ async function getGoogleOAuthTokens({
+  code,
+}){
+  try {
+  const url = "https://oauth2.googleapis.com/token";
+  
+  const values = {
+    code,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URL,
+    grant_type: "authorization_code",
+  };
+
+    const res = await axios.post(
+      url,
+      values,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error(error.response.data.error);
+    console.log(error, "Failed to fetch Google Oauth Tokens");
+    throw new Error(error.message);
+  }
+}
+
+async function getGoogleUser({
+  id_token,
+  access_token,
+}){
+  try {
+    const res = await axios.get(
+      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
+      {
+        headers: {
+          Authorization: `Bearer ${id_token}`,
+        },
+      }
+    );
+    // const user = await axios.get(
+    //   `https://people.googleapis.com/v1/people/me?personFields=addresses,phoneNumbers`,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${access_token}`,
+    //     },
+    //   }
+    // )
+    // console.log(user.data);
+    return {res:res.data};
+  } catch (error) {
+    console.log(error, "Error fetching Google user");
+    throw new Error(error.message);
+  }
+}
+
 
 // async function addFavourite(idEvent, idUser){
 // const allFavourites= await userController.readOne({_id:idUser}, "favourites -_id")
@@ -188,7 +250,9 @@ module.exports = {
   changePassword,
   verifyToken,
   checkUserType,
-  checkToken
+  checkToken,
+  getGoogleOAuthTokens,
+  getGoogleUser
   // addFavourite,
   // removeFavourite
 }

@@ -7,6 +7,7 @@ const err = (c, m) => {
 const errMessage = Object.freeze({
   MISSING_DATA: err(400, "missing data"),
   USER_NOT_FOUND: err(400, "user not found"),
+  FORBIDDEN: err(403, "forbidden"),
   USER_NOT_AQCTIVE: err(400, "user not active"),
   USER_ALREADY_REGISTERED: err(400, "user already registered"),
   USER_NOT_REGISTERED: err(400, "user not registered"),
@@ -25,7 +26,7 @@ const errMessage = Object.freeze({
 
 const sendError = (res, err, userMail = "") => {
   console.log(err);
-  if (err?.code !== 400 && err?.code !== 401)
+  if (err.code !== 400 && err.code !== 401)
     sendMail(
       process.env.EROREMAIL,
       "error in server",

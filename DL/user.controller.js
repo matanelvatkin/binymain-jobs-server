@@ -52,10 +52,10 @@ async function readOne (filter, proj){
 // }
 
 
-
 module.exports = {
     create,
     find,
     update,
-    findEmail
+    findEmail,
+    readOne
 }
