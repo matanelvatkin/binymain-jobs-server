@@ -19,7 +19,7 @@ async function find(user) {
 }
 
 async function update(email, newData) {
-  return await userData.updateOne({ email: email}, newData)
+  return await userData.findOneAndUpdate({ email: email}, newData, { returnDocument: 'after' })
 }
 
 
