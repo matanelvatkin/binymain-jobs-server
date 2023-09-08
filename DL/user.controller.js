@@ -41,8 +41,8 @@ async function read(filter, proj){
 }
 
 async function readOne (filter, proj){
-  let res= await read(filter, proj);
-  return res[0]
+  let res= await userData.findOne(filter, proj);
+  return res
 
 }
 
