@@ -14,6 +14,16 @@ userRouter.post("/creatUser", async (req, res) => {
   }
 });
 
+userRouter.put("/updateDetails",userServices.checkToken,async(req,res) =>{
+try {
+  const user = await userServices.updateDetails(req.body,req.user)
+  res.status(200).send(user)
+} catch (error) {
+   sendError(res, error);
+
+}
+})
+
 // userRouter.delete('', async (req, res) => {
 
 // });
