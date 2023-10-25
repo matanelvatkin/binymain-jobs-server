@@ -64,9 +64,7 @@ userRouter.get("/google-login", async (req, res) => {
       { expiresIn: "1440h" }
     );
     res.redirect(
-      req.query.scope.includes("https://www.googleapis.com/auth/user.phonenumbers.read")?
-      `${process.env.GOOGLE_OAUTH_REDIRECT_URL_FINAL}?token=${token}`:
-      `https://server-vike.vercel.app/googleRegister?token=${token}`
+      `https://binymain-jobs.vercel.app/googleRegister?token=${token}`
     );
   } catch (err) {
     sendError(res, err);
