@@ -11,6 +11,7 @@ const fs = require("fs");
 app.use(express.json());
 app.use(cors());
 app.use("/upload", express.static("./upload"));
+app.use("/icons", express.static("./icons"));
 
 app.use("/api", mainRouter);
 
